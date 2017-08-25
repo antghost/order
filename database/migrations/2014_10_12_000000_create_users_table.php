@@ -20,8 +20,12 @@ class CreateUsersTable extends Migration
             $table->string('nickname',100)->unique();
             $table->unsignedTinyInteger('active');
             $table->string('email')->unique();
-            $table->string('telephone', 20);
+            $table->string('tag')->nullable();
+            $table->string('telephone', 20)->nullable();
+            $table->integer('mobilephone')->nullable();
+            $table->string('ip_address', 16)->nullable();
             $table->string('password');
+            $table->dateTime('last_login_at')->nullable();
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

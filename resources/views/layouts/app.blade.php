@@ -37,7 +37,9 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
-                        &nbsp;
+                        &nbsp;<li>
+                            <a href="{{ url('/') }}">论坛</a>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -54,6 +56,13 @@
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
+                                        @if (Auth::guard())
+                                            <a href="{{ url('user/account') }}">设置</a>
+                                        @else
+                                            <a href="{{ url('user/account') }}">设置</a>
+                                        @endif
+                                    </li>
+                                    <li>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
@@ -65,6 +74,13 @@
                                         </form>
                                     </li>
                                 </ul>
+                            </li>
+                            <li>
+                                <a href="{{ route('logout') }}"
+                                   onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                    退出
+                                </a>
                             </li>
                         @endif
                     </ul>

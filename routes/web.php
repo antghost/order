@@ -18,3 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+//用户功能
+Route::group(['namespace' => 'User', 'prefix' => 'user'], function (){
+    Route::get('/', 'HomeController@index');
+});
