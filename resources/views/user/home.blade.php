@@ -23,7 +23,25 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <div>
+                        <p>
+                            <strong>本人餐费标准</strong>
+                            <label> 早餐：</label>10.00
+                            <label> 午餐：</label>15.00
+                            <label> 晚餐：</label>10.00
+                        </p>
+                    </div>
+                    <div>
+                        <h3>本月用餐天数</h3>
+                        <label> 早餐：</label>3
+                        <label> 午餐：</label>4
+                        <label> 晚餐：</label>8
+                        <h3>本月用餐费用</h3>
+                        <label> 早餐：</label>30.00
+                        <label> 午餐：</label>95.00
+                        <label> 晚餐：</label>50.00
+                        <p><label>费用合计：</label>385.00</p>
+                    </div>
                 </div>
             </div>
         </div>
