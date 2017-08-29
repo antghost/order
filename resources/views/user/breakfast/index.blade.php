@@ -24,12 +24,18 @@
                             </ul>
                         </div>
 
-                        <div class="col-md-3">
-                            <label>开始日期</label><input type="button" class="btn btn-info" value="select">
+                        <div class="col-md-12">
+                            <p>breakfast book</p>
+                            <table>
+                                <thead>
+                                <t></t>
+                                    <th></th>
+                                </thead>
+                            </table>
                         </div>
-
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
