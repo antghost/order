@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Meal-System') }}</title>
 
     <!-- Styles -->
 {{--    <link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
@@ -57,7 +57,7 @@
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                         @if (Auth::guard())
-                                            <a href="{{ url('user/account') }}">设置</a>
+                                            <a href="{{ url('user/profile') }}">设置</a>
                                         @else
                                             <a href="{{ url('user/account') }}">设置</a>
                                         @endif

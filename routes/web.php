@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'IndexController@index');
 
 Auth::routes();
 
@@ -22,4 +20,15 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['namespace' => 'User', 'prefix' => 'user'], function (){
     Route::get('/', 'HomeController@index');
     Route::get('/breakfast', 'BreakfastController@index');
+    Route::get('/breakfast/create', 'BreakfastController@create');
+    Route::get('/profile', 'ProfileController@index');
+});
+
+//食堂工作人员功能
+Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth'], function (){
+    Route::get('/', 'HomeController@index');
+    Route::resource('/menu', 'MenuController');
+    Route::get('/breakfast', 'BreakfastController@index');
+    Route::get('/breakfast/create', 'BreakfastController@create');
+    Route::get('/profile', 'ProfileController@index');
 });
