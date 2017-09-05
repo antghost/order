@@ -8,7 +8,7 @@
             @endcomponent
 
             <div class="col-md-9 col-md-offset-0">
-                <div class="panel panel-default">
+                <div class="panel panel-info">
                     <div class="panel-body">
                         @if (session('status'))
                             <div class="alert alert-success">

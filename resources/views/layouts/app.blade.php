@@ -14,7 +14,7 @@
 {{--    <link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
     <link href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}" rel="stylesheet">
 </head>
-<body>
+<body style="background-color:whitesmoke">
     <div id="app">
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
