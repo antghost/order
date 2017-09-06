@@ -39,9 +39,11 @@
                     <ul class="nav navbar-nav">
                         &nbsp;
                         @if(Auth::check())
-                        <li>
-                            <a href="{{ url('/') }}">论坛</a>
-                        </li>
+                            <li>
+                                <a href="{{ url('/') }}">论坛</a>
+                            </li>
+                            <li><a href="{{ url('/user') }}">用户</a></li>
+                            <li><a href="{{ url('/admin') }}">管理员</a></li>
                         @endif
                     </ul>
 
