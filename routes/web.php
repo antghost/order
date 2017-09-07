@@ -43,13 +43,7 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth
 //管理员功能
 Route::group(['namespace' => 'admin', 'prefix' => 'admin', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
-    //菜单
-    Route::resource('/menu', 'MenuController');
-    //定餐时限
-    Route::resource('/limit', 'LimitController');
-    //员工开停餐
-    Route::resource('/order', 'OrderController');
-    Route::get('/breakfast', 'BreakfastController@index');
-    Route::get('/breakfast/create', 'BreakfastController@create');
-    Route::get('/profile', 'ProfileController@index');
+    Route::resource('/dept', 'DeptController');
+    Route::resource('/user', 'UserController');
+    Route::resource('/fee', 'FeeController');
 });
