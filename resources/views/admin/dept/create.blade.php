@@ -18,23 +18,24 @@
                     <!--<div class="panel-heading">概况</div>-->
 
                     <div class="panel-body">
-                        @if (session('status'))
-                            <div class="alert alert-success">
-                                {{ session('status') }}
+                        @if (count($errors) > 0)
+                            <div class="alert alert-danger">
+                                {!! implode('<br>', $errors->all()) !!}
                             </div>
                         @endif
 
                         <div class="col-md-12">
                             <form class="form-horizontal" action="{{ url('admin/dept') }}" method="post">
+                                {{ csrf_field() }}
                                 <div class="form-group">
                                     <label class="control-label col-md-2">部门名称</label>
                                     <div class="col-md-5">
                                         <input type="text" name="name" class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group text-right">
                                     <div class="col-md-2">
-                                        <button type="submit" class="btn btn-info text-right">submit</button>
+                                        <button type="submit" class="btn btn-info">提交</button>
                                     </div>
                                 </div>
                             </form>

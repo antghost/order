@@ -25,7 +25,8 @@
                         @endif
 
                         <div class="col-md-12">
-                            <form class="form-horizontal" action="{{ url('admin/dept') }}" method="post">
+                            <form class="form-horizontal" action="{{ url('admin/user') }}" method="post">
+                                {{ csrf_field() }}
                                 <div class="form-group">
                                     <label class="control-label col-md-2">用户名</label>
                                     <div class="col-md-5">
@@ -41,7 +42,11 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2">所属部门</label>
                                     <div class="col-md-5">
-                                        <input type="text" name="dept" class="form-control" required>
+                                        <select name="dept" class="form-control">
+                                            @foreach($depts as $dept)
+                                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -52,13 +57,13 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-md-2">密码</label>
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <input type="password" name="password" class="form-control" required value="">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-md-2">密码确认</label>
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <input type="password" name="password_confirmation" class="form-control" required value="">
                                     </div>
                                 </div>

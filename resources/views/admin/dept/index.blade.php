@@ -33,13 +33,15 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                @foreach($depts as $dept)
                                 <tr>
-                                    <td>飞人部</td>
+                                    <td>{{ $dept->name }}</td>
                                     <td>
                                         <a href="#" class="btn btn-info">编辑</a>
                                         <a href="#" class="btn btn-danger">删除</a>
                                     </td>
                                 </tr>
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>

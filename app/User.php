@@ -26,4 +26,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    //多对多员工所属部门
+    public function depts()
+    {
+        return $this->belongsToMany('App\Models\Dept', 'userdepts')->withTimestamps();
+    }
 }
