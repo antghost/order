@@ -28,14 +28,19 @@
                                 <form action="#" class="navbar-form navbar-left" role="search">
                                     <div class="form-group">
                                         <label for="startdate">部门</label>
-                                        <input type="text" id="startdate" class="form-control">
+                                        <select name="dept" class="form-control">
+                                            <option value=""></option>
+                                            @foreach($depts as $dept)
+                                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="enddate">姓名</label>
-                                        <input type="text" id="enddate" class="form-control">
+                                        <label for="name">姓名</label>
+                                        <input type="text" id="name" name="name" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">search</button>
+                                        <button type="submit" class="btn btn-primary">搜索</button>
                                     </div>
                                 </form>
                             </div>
