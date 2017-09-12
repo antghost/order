@@ -27,11 +27,16 @@
                         <div class="col-md-12">
                             <form class="form-horizontal" action="{{ url('admin/user') }}" method="post">
                                 {{ csrf_field() }}
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('username') ? 'has-error' : '' }}">
                                     <label class="control-label col-md-2">用户名</label>
                                     <div class="col-md-5">
                                         <input type="text" name="username" class="form-control" required value="{{ old('username') }}">
                                     </div>
+                                    @if($errors->has('username'))
+                                        <span class="help-block">
+                                            <strong>{{ $errors->first('username') }}</strong>
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-md-2">姓名</label>
