@@ -30,13 +30,13 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2">用户名</label>
                                     <div class="col-md-5">
-                                        <input type="text" name="username" class="form-control" required>
+                                        <input type="text" name="username" class="form-control" required value="{{ old('username') }}">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-md-2">姓名</label>
                                     <div class="col-md-5">
-                                        <input type="text" name="name" class="form-control" required>
+                                        <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -44,7 +44,11 @@
                                     <div class="col-md-5">
                                         <select name="dept" class="form-control">
                                             @foreach($depts as $dept)
-                                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                                @if ($dept->id == old('dept'))
+                                                    <option value="{{ $dept->id }}" selected>{{ $dept->name }}</option>
+                                                @else
+                                                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
@@ -52,7 +56,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2">E-mail</label>
                                     <div class="col-md-5">
-                                        <input type="email" name="email" class="form-control" required>
+                                        <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
                                     </div>
                                 </div>
                                 <div class="form-group">

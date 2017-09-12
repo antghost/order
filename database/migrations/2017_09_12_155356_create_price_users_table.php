@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePricesTable extends Migration
+class CreatePriceUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreatePricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('prices', function (Blueprint $table) {
+        Schema::create('price_users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 100)->unique();
+            $table->dateTime('begin_date')->comment('开始日期');
+            $table->dateTime('valid_date')->comment('有效日期');
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('price_id');
             $table->decimal('breakfast', 10, 2);
             $table->decimal('lunch', 10, 2);
             $table->decimal('dinner', 10, 2);
-            $table->dateTime('begin_date')->comment('生效日期');
-            $table->string('status', 1)->nullable()->comment('状态');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -33,6 +34,6 @@ class CreatePricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('prices');
+        Schema::dropIfExists('price_users');
     }
 }
