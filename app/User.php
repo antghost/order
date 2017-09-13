@@ -36,4 +36,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Models\Dept', 'userdepts')->withTimestamps();
     }
+
+    public function dept()
+    {
+        return $this->belongsTo();
+    }
 }
