@@ -68,8 +68,12 @@
                                     </td>
                                     <td>早餐：午餐：晚餐：</td>
                                     <td>
-                                        <a href="{{ url('admin/user/'.$user->id) }}" class="btn btn-info">编辑</a>
-                                        <a href="#" class="btn btn-danger">删除</a>
+                                        <a href="{{ url('admin/user/'.$user->id.'/edit') }}" class="btn btn-info">编辑</a>
+                                        <form action="{{ url('admin/user/'.$user->id) }}" method="post" style="display: inline">
+                                            {{ csrf_field() }}
+                                            {{method_field('DELETE')}}
+                                            <button type="button" onclick="__del(this)" class="btn btn-danger">删除</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -83,4 +87,18 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script src="{{ asset('layer/layer.js') }}"></script>
+    <script>
+        //删除单条记录提示确认
+        function __del(obj) {
+            layer.confirm('确认删除？',function (index) {
+                obj.parentNode.submit();
+                layer.close(index);
+                layer.load(1);
+            });
+        }
+    </script>
 @endsection
