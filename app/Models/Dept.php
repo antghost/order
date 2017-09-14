@@ -9,9 +9,9 @@ class Dept extends Model
 {
     protected $fillable = ['pid', 'name'];
 
-    //多对多，部门内的所有人员
+    //一对多，部门内的所有人员
     public function users()
     {
-        return $this->belongsToMany('App\User', 'userdepts');
+        return $this->hasMany('App\User');
     }
 }

@@ -45,15 +45,17 @@ class UserController extends Controller
             'nickname' => $request->input('nickname'),
             'email' => $request->input('email'),
             'active' => 1,
+            'is_admin' => 0,
+            'dept_id' => $request->input('dept'),
             'password' => bcrypt($request->input('password')),
         ]);
 
         if(isset($user)){
             //写入中间表数据
-            Userdept::create([
-                'dept_id' => $request->input('dept'),
-                'user_id' => $user->id,
-            ]);
+//            Userdept::create([
+//                'dept_id' => $request->input('dept'),
+//                'user_id' => $user->id,
+//            ]);
 
             return redirect('admin/user');
         } else {

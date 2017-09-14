@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'name', 'email', 'password', 'nickname', 'active',
+        'username', 'name', 'email', 'password', 'nickname', 'active', 'dept_id', 'is_admin',
         //'tag', 'telephone', 'mobilephone', 'ip_address', 'last_login_at',
     ];
 
@@ -32,13 +32,14 @@ class User extends Authenticatable
     protected $dates = ['deleted_at'];
 
     //多对多员工所属部门
-    public function depts()
-    {
-        return $this->belongsToMany('App\Models\Dept', 'userdepts')->withTimestamps();
-    }
+//    public function depts()
+//    {
+//        return $this->belongsToMany('App\Models\Dept', 'userdepts')->withTimestamps();
+//    }
 
+    //多对一
     public function dept()
     {
-        return $this->belongsTo();
+        return $this->belongsTo('App\Models\Dept');
     }
 }

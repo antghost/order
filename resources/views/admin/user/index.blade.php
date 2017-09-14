@@ -61,11 +61,7 @@
                                 <tr>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->username }}</td>
-                                    <td>
-                                        @foreach($user->depts as $dept)
-                                            {{ $dept->name or '' }}
-                                        @endforeach
-                                    </td>
+                                    <td>{{ $user->dept->name or '' }}</td>
                                     <td>早餐：午餐：晚餐：</td>
                                     <td>
                                         <a href="{{ url('admin/user/'.$user->id.'/edit') }}" class="btn btn-info">编辑</a>

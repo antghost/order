@@ -67,7 +67,9 @@
                                     <div class="col-md-5">
                                         <select name="dept" class="form-control">
                                             @foreach($depts as $dept)
-                                                @if ($dept->id == old('dept'))
+                                                @if ($user->dept == '')
+                                                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                                @elseif($dept->id == $user->dept->id)
                                                     <option value="{{ $dept->id }}" selected>{{ $dept->name }}</option>
                                                 @else
                                                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
