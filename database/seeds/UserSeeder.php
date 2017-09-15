@@ -12,8 +12,14 @@ class UserSeeder extends Seeder
     public function run()
     {
         //
-        factory('App\User', 300)->create([
-            'password' => bcrypt('123456'),
-        ]);
+//        factory('App\User', 300)->create([
+//            'password' => bcrypt('123456'),
+//        ]);
+        //批量随机更新人员所属部门
+        $depts = DB::table('depts')->select('id')->get();
+        for ($i =1 ;$i< 303 ; $i++){
+            DB::table('users')->where('id', $i)
+                ->update(['dept_id' => $depts->random()->id]);
+        }
     }
 }

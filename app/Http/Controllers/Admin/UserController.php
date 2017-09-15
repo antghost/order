@@ -35,7 +35,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         //闪存数据
-        $request->flash();
+        $request->flashExcept('password');
 
         $this->validator($request->input())->validate();
 
@@ -70,32 +70,26 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        if($request->input('password') == '') {
-            $this->validate($request, [
-                'username' => 'required|string|unique:users,username,' . $id . '|max:255',
-                'name' => 'required|string|max:255',
-                'nickname' => 'required|string|unique:users,nickname,' . $id . '|max:255',
-            ]);
-        } else {
-            $this->validate($request, [
-                'username' => 'required|string|unique:users,username,' . $id . '|max:255',
-                'name' => 'required|string|max:255',
-                'nickname' => 'required|string|unique:users,nickname,' . $id . '|max:255',
-                'password' => 'string|min:6|confirmed',
-            ]);
-        }
+        $this->validate($request, [
+            'username' => 'required|string|unique:users,username,' . $id . '|max:255',
+            'name' => 'required|string|max:255',
+            'nickname' => 'required|string|unique:users,nickname,' . $id . '|max:255',
+            'password' => 'nullable|string|min:6|confirmed',
+            'email' => 'required|email|unique:users,email,' . $id . '|max:255',
+        ]);
 
         $user = User::findOrFail($id);
         $user->username = $request->input('username');
         $user->name = $request->input('name');
         $user->nickname = $request->input('nickname');
         $user->email = $request->input('email');
+        $user->dept_id = $request->input('dept');
         if (!empty($request->input('password'))){
             $user->password = bcrypt($request->input('password'));
         }
 
         if($user->save()){
-            return redirect()->back();
+            return redirect()->back()->with('status', '更新成功！');
         } else {
             return redirect()->back()->withInput()->withErrors('更新失败', 'msg');
         }
@@ -106,4 +100,29 @@ class UserController extends Controller
         User::destroy($id);
         return redirect()->back();
     }
+
+    public function search(Request $request)
+    {
+        $request->flash();
+        $dept_id = $request->input('dept');
+        $name = $request->input('name');
+
+        //查询条件
+        $users = User::when($dept_id, function ($query) use ($dept_id){
+            return $query->whereHas('dept', function ($query) use ($dept_id){
+                $query->where('id', $dept_id);
+            });
+        })->when($name, function ($query) use ($name){
+            return $query->where('name', 'like', '%'.$name.'%');
+        })->paginate(15);
+
+        //分页查询参数
+        $users = $users->appends([
+            'name' => $name,
+            'dept' => $dept_id,
+        ]);
+
+        return view('admin.user.index', ['users' => $users, 'depts' => Dept::all()]);
+    }
+
 }

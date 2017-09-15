@@ -23,24 +23,48 @@
                                 {{ session('status') }}
                             </div>
                         @endif
+                        @if (count($errors) >0 )
+                                <div class="alert alert-warning">
+                                    {!! implode('<br>',$errors->all()) !!}
+                                </div>
+                        @endif
 
                         <div class="col-md-12">
-                            <form class="form-horizontal" action="{{ url('admin/dept') }}" method="post">
+                            <form class="form-horizontal" action="{{ url('admin/fee') }}" method="post">
+                                {{csrf_field()}}
                                 <div class="form-group">
                                     <label class="control-label col-md-2">名称</label>
                                     <div class="col-md-5">
-                                        <input type="text" name="name" class="form-control" required>
+                                        <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-2">标准</label>
+                                    <label class="control-label col-md-2">早餐</label>
                                     <div class="col-md-5">
-                                        <input type="text" name="name" class="form-control" required>
+                                        <input type="number" name="breakfast" class="form-control" required value="{{ old('breakfast') }}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">午餐</label>
+                                    <div class="col-md-5">
+                                        <input type="number" name="lunch" class="form-control" required value="{{ old('lunch') }}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">晚餐</label>
+                                    <div class="col-md-5">
+                                        <input type="number" name="dinner" class="form-control" required value="{{ old('dinner') }}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">生效日期</label>
+                                    <div class="col-md-5">
+                                        <input type="text" name="begin_date" class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-2 text-right">
-                                        <button type="submit" class="btn btn-info text-right">submit</button>
+                                        <button type="submit" class="btn btn-info text-right">提交</button>
                                     </div>
                                 </div>
                             </form>

@@ -19,9 +19,14 @@
                     <!--<div class="panel-heading">概况</div>-->
 
                     <div class="panel-body">
-                        @if ($errors->has('msg'))
-                            <div class="alert alert-warning">
-                                {!! implode('<br>',$errors->first('msg')) !!}
+                        {{--@if ($errors->has('msg'))--}}
+                            {{--<div class="alert alert-warning">--}}
+                                {{--{!! implode('<br>',$errors->first('msg')) !!}--}}
+                            {{--</div>--}}
+                        {{--@endif--}}
+                        @if (session('status'))
+                            <div class="alert alert-success">
+                                {{ session('status') }}
                             </div>
                         @endif
 

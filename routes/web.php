@@ -44,6 +44,8 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth
 Route::group(['namespace' => 'admin', 'prefix' => 'admin', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
     Route::resource('/dept', 'DeptController');
+    Route::get('/user/search', 'UserController@search'); //search顺序要放在UserController@show之前
     Route::resource('/user', 'UserController');
     Route::resource('/fee', 'FeeController');
+
 });

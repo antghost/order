@@ -25,19 +25,23 @@
                         @endif
 
                             <div class="col-md-12">
-                                <form action="#" class="navbar-form navbar-left" role="search">
+                                <form action="{{ url('admin/user/search') }}" class="navbar-form navbar-left" role="search">
                                     <div class="form-group">
-                                        <label for="startdate">部门</label>
-                                        <select name="dept" class="form-control">
+                                        <label for="dept">部门</label>
+                                        <select name="dept" id="dept" class="form-control">
                                             <option value=""></option>
                                             @foreach($depts as $dept)
-                                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                                @if($dept->id == old('dept'))
+                                                    <option value="{{ $dept->id }}" selected>{{ $dept->name }}</option>
+                                                @else
+                                                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="name">姓名</label>
-                                        <input type="text" id="name" name="name" class="form-control">
+                                        <input type="text" id="name" name="name" class="form-control" value="{{old('name')}}">
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">搜索</button>

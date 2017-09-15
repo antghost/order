@@ -28,20 +28,22 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th>名称</th>
-                                    <th>明细</th>
+                                    <th>费用名称</th>
+                                    <th>费用标准</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
+                                @foreach($prices as $price)
                                 <tr>
-                                    <td>员工</td>
-                                    <td>早餐：午餐：晚餐：</td>
+                                    <td>{{ $price->name }}</td>
+                                    <td>{{ '早餐：'.$price->breakfast.' 午餐：'.$price->lunch.' 晚餐：'.$price->dinner}}</td>
                                     <td>
                                         <a href="#" class="btn btn-info">编辑</a>
                                         <a href="#" class="btn btn-danger">删除</a>
                                     </td>
                                 </tr>
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
