@@ -19,7 +19,7 @@ class CreatePricesTable extends Migration
             $table->decimal('breakfast', 10, 2);
             $table->decimal('lunch', 10, 2);
             $table->decimal('dinner', 10, 2);
-            $table->dateTime('begin_date')->comment('生效日期');
+            $table->dateTime('begin_date')->nullable()->comment('生效日期');
             $table->string('status', 1)->nullable()->comment('状态');
             $table->softDeletes();
             $table->timestamps();

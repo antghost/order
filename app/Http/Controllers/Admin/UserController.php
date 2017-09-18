@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\User;
 use App\Models\Dept;
@@ -42,6 +43,7 @@ class UserController extends Controller
         $this->validator($request->input())->validate();
 
         //需要增加事务，确保用户与对应的标准同时添加成功
+        DB::beginTransaction();
         $user = User::create([
             'username' => $request->input('username'),
             'name' => $request->input('name'),
@@ -59,7 +61,7 @@ class UserController extends Controller
             $lunch = $price->lunch;
             $dinner = $price->dinner;
             //写入中间表数据
-            PriceUser::create([
+            $priceUser = PriceUser::create([
                 'begin_date' => Carbon::tomorrow(),
                 'user_id' => $user->id,
                 'price_id' => $request->input('price'),
@@ -67,9 +69,15 @@ class UserController extends Controller
                 'lunch' => $lunch,
                 'dinner' => $dinner,
             ]);
+            if (isset($priceUser)){
+                DB::commit();
+                return redirect('admin/user');
+            } else {
+                DB::rollBack();
+            }
 
-            return redirect('admin/user');
         } else {
+            DB::rollBack();
             return redirect()->back()->withInput()->withErrors('提交失败');
         }
     }

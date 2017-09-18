@@ -16,7 +16,7 @@ class CreatePriceUsersTable extends Migration
         Schema::create('price_users', function (Blueprint $table) {
             $table->increments('id');
             $table->dateTime('begin_date')->comment('开始日期');
-            $table->dateTime('valid_date')->comment('有效日期');
+            $table->dateTime('valid_date')->nullable()->comment('有效日期');
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('price_id');
             $table->decimal('breakfast', 10, 2);
