@@ -74,6 +74,20 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">餐费标准</label>
+                                    <div class="col-md-5">
+                                        <select name="price" class="form-control">
+                                            @foreach($prices as $price)
+                                                @if ($price->id == old('price'))
+                                                    <option value="{{ $price->id }}" selected>{{ $price->name }}</option>
+                                                @else
+                                                    <option value="{{ $price->id }}">{{ $price->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group {{ $errors->has('email' ? 'has-error' : '') }}">
                                     <label class="control-label col-md-2">E-mail</label>
                                     <div class="col-md-5">

@@ -66,7 +66,7 @@
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->username }}</td>
                                     <td>{{ $user->dept->name or '' }}</td>
-                                    <td>早餐：午餐：晚餐：</td>
+                                    <td>{{'早餐：午餐：晚餐：'}}</td>
                                     <td>
                                         <a href="{{ url('admin/user/'.$user->id.'/edit') }}" class="btn btn-info">编辑</a>
                                         <form action="{{ url('admin/user/'.$user->id) }}" method="post" style="display: inline">

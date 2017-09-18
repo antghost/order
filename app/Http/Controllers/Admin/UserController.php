@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\User;
 use App\Models\Dept;
-use App\Models\Userdept;
+use App\Models\Price;
+use App\Models\PriceUser;
 
 class UserController extends Controller
 {
@@ -18,7 +20,7 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('admin.user.create', ['depts' => Dept::all()]);
+        return view('admin.user.create', ['depts' => Dept::all(), 'prices' => Price::all()]);
     }
 
     //数据校验
@@ -39,6 +41,7 @@ class UserController extends Controller
 
         $this->validator($request->input())->validate();
 
+        //需要增加事务，确保用户与对应的标准同时添加成功
         $user = User::create([
             'username' => $request->input('username'),
             'name' => $request->input('name'),
@@ -51,11 +54,19 @@ class UserController extends Controller
         ]);
 
         if(isset($user)){
+            $price = Price::findOrFail($request->input('price'));
+            $breakfast = $price->breakfast;
+            $lunch = $price->lunch;
+            $dinner = $price->dinner;
             //写入中间表数据
-//            Userdept::create([
-//                'dept_id' => $request->input('dept'),
-//                'user_id' => $user->id,
-//            ]);
+            PriceUser::create([
+                'begin_date' => Carbon::tomorrow(),
+                'user_id' => $user->id,
+                'price_id' => $request->input('price'),
+                'breakfast' => $breakfast,
+                'lunch' => $lunch,
+                'dinner' => $dinner,
+            ]);
 
             return redirect('admin/user');
         } else {

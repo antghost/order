@@ -11,4 +11,10 @@ class Price extends Model
     protected $fillable = ['name', 'breakfast' , 'lunch' , 'dinner' , 'begin_date' , 'status' ];
 
     protected $dates = ['deleted_at'];
+
+    //属于该收费标准下的所有人员
+    public function users()
+    {
+        return $this->hasMany('App\User');
+    }
 }

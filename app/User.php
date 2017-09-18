@@ -42,4 +42,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Models\Dept');
     }
+
+    //个人收费标准
+    public function prices()
+    {
+        return $this->hasMany('App\Models\PriceUser');
+    }
 }

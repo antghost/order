@@ -37,7 +37,7 @@
                                 <tr>
                                     <td>{{ $dept->name }}</td>
                                     <td>
-                                        <a href="#" class="btn btn-info">编辑</a>
+                                        <a href="{{ url('admin/dept/'.$dept->id.'/edit') }}" class="btn btn-info">编辑</a>
                                         <a href="#" class="btn btn-danger">删除</a>
                                     </td>
                                 </tr>

@@ -39,7 +39,7 @@
                                     <td>{{ $price->name }}</td>
                                     <td>{{ '早餐：'.$price->breakfast.' 午餐：'.$price->lunch.' 晚餐：'.$price->dinner}}</td>
                                     <td>
-                                        <a href="#" class="btn btn-info">编辑</a>
+                                        <a href="{{ url('admin/fee/'.$price->id.'/edit') }}" class="btn btn-info">编辑</a>
                                         <a href="#" class="btn btn-danger">删除</a>
                                     </td>
                                 </tr>
