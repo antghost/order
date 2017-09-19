@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'name', 'email', 'password', 'nickname', 'active', 'dept_id', 'is_admin',
+        'username', 'name', 'email', 'password', 'nickname', 'active', 'dept_id', 'price_id', 'is_admin',
         //'tag', 'telephone', 'mobilephone', 'ip_address', 'last_login_at',
     ];
 
@@ -37,7 +37,7 @@ class User extends Authenticatable
 //        return $this->belongsToMany('App\Models\Dept', 'userdepts')->withTimestamps();
 //    }
 
-    //多对一
+    //所属部门
     public function dept()
     {
         return $this->belongsTo('App\Models\Dept');
@@ -46,6 +46,12 @@ class User extends Authenticatable
     //收费标准
     public function price()
     {
-        return $this->hasOne('App\Models\PriceUser');
+        return $this->belongsTo('App\Models\Price');
+    }
+
+    //收费标准历史
+    public function prices()
+    {
+        return $this->hasMany('App\Models\PriceUser');
     }
 }
