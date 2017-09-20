@@ -49,8 +49,8 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Price');
     }
 
-    //收费标准历史
-    public function prices()
+    //收费标准个人历史
+    public function priceUsers()
     {
         return $this->hasMany('App\Models\PriceUser');
     }
