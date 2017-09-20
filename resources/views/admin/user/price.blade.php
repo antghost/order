@@ -65,7 +65,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <button type="button" name="submit" class="btn btn-primary" disabled>修改</button>
+                                        <button type="submit" name="submit" class="btn btn-primary" disabled>修改</button>
                                     </div>
                                 </div>
 
@@ -112,14 +112,14 @@
 @section('script')
     <script src="{{ asset('layer/layer.js') }}"></script>
     <script>
-        $('button[name=submit]').click(function () {
-            layer.confirm('确认修改？修改后原收费标准将失效。', function (index) {
-                $('button[name=submit]').prop('disabled', true).text('正在提交');
-                layer.close(index);
-                console.log($('form').action());
-//                layer.load(1);
-            });
-        });
+//        $('button[name=submit]').click(function () {
+//            layer.confirm('修改后原收费标准将失效,确认修改？', function (index) {
+//                $('form').submit();
+//                $('button[name=submit]').prop('disabled', true).text('正在提交');
+//                layer.close(index);
+//            });
+//        });
+
 
         $('select[name=price]').change(function () {
             if ($(this).val() == $('input[name=price_id]').val()){
