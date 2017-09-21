@@ -64,7 +64,14 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-2">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">开始日期：</label>
+                                    <div class="col-md-3">
+                                        <input type="datetime" class="form-control" name="begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}">
+                                    </div>
+                                    <div class="col-md-5">
                                         <button type="submit" name="submit" class="btn btn-primary" disabled>修改</button>
                                     </div>
                                 </div>

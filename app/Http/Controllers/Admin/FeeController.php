@@ -8,16 +8,25 @@ use App\Models\Price;
 
 class FeeController extends Controller
 {
+    /*
+     * 显示收费标准列表
+     */
     public function index()
     {
         return view('admin.fee.index', ['prices' => Price::all()]);
     }
 
+    /*
+     * 显示创建收费标准页面
+     */
     public function create()
     {
         return view('admin.fee.create');
     }
 
+    /*
+     * 新增收费标准
+     */
     public function store(Request $request)
     {
         $request->flash();
@@ -45,11 +54,17 @@ class FeeController extends Controller
         }
     }
 
+    /*
+     * 显示编辑收费标准页面
+     */
     public function edit($id)
     {
         return view('admin.fee.edit', ['price' => Price::find($id)]);
     }
 
+    /*
+     * 更新收费标准
+     */
     public function update(Request $request, $id)
     {
         $this->validate($request,[

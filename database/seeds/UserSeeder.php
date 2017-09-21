@@ -17,9 +17,9 @@ class UserSeeder extends Seeder
 //        ]);
         //批量随机更新人员所属部门
         $depts = DB::table('depts')->select('id')->get();
-        $count = DB::table('users')->count();
-        for ($i =1 ;$i<= $count ; $i++){
-            DB::table('users')->where('id', $i)
+        $users = DB::table('users')->get();
+        foreach ($users as $user){
+            DB::table('users')->where('id', $user->id)
                 ->update(['dept_id' => $depts->random()->id]);
         }
     }

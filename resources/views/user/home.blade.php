@@ -21,9 +21,9 @@
                     <div class="col-md-12">
                         <p>
                             <strong>本人餐费标准</strong>
-                            <label> 早餐：</label>10.00
-                            <label> 午餐：</label>15.00
-                            <label> 晚餐：</label>10.00
+                            <label> 早餐：</label>{{ Auth::user()->price->breakfast }}
+                            <label> 午餐：</label>{{ Auth::user()->price->lunch }}
+                            <label> 晚餐：</label>{{ Auth::user()->price->dinner }}
                         </p>
                         <hr>
                     </div>

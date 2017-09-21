@@ -8,16 +8,25 @@ use App\Models\Dept;
 
 class DeptController extends Controller
 {
+    /*
+     * 显示部门列表
+     */
     public function index()
     {
         return view('admin.dept.index', ['depts' => Dept::all()]);
     }
 
+    /*
+     * 创建部门页面
+     */
     public function create()
     {
         return view('admin.dept.create');
     }
 
+    /*
+     * 新增部门
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -34,11 +43,17 @@ class DeptController extends Controller
         }
     }
 
+    /*
+     * 显示编辑部门页面
+     */
     public function edit($id)
     {
         return view('admin.dept.edit', ['dept' => Dept::findOrFail($id)]);
     }
 
+    /**
+     * 更新部门信息
+     */
     public function update(Request $request, $id)
     {
         $this->validate($request,[
