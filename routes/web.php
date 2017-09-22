@@ -18,7 +18,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //用户功能
-Route::group(['namespace' => 'User', 'prefix' => 'user'], function (){
+Route::group(['namespace' => 'User', 'prefix' => 'user', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
     //早餐
     Route::get('/breakfast', 'BreakfastController@index');
@@ -44,9 +44,11 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth
 Route::group(['namespace' => 'admin', 'prefix' => 'admin', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
     Route::resource('/dept', 'DeptController');
+    //个人餐费标准历史
     Route::get('/user/price/{id}/edit', 'PriceUserController@edit');
     Route::put('/user/price/{id}', 'PriceUserController@update');
-    Route::get('/user/search', 'UserController@search'); //search顺序要放在UserController@show之前
+    //用户搜索功能，search顺序要放在UserController@show之前
+    Route::get('/user/search', 'UserController@search');
     Route::resource('/user', 'UserController');
     Route::resource('/fee', 'FeeController');
 

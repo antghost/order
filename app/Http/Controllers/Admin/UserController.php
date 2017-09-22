@@ -139,7 +139,17 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        User::destroy($id);
+        DB::beginTransaction();
+        try {
+            //删除对应的餐费标准历史
+            User::findOrFail($id)->priceUsers()->delete();
+            User::destroy($id);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
         return redirect()->back();
     }
 
