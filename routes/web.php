@@ -33,6 +33,8 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth
     Route::resource('/menu', 'MenuController');
     //定餐时限
     Route::resource('/limit', 'LimitController');
+    //用户搜索功能，search顺序要放在UserController@show之前
+    Route::get('/order/search', 'OrderController@search');
     //员工开停餐
     Route::resource('/order', 'OrderController');
     Route::get('/breakfast', 'BreakfastController@index');
