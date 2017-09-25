@@ -60,8 +60,8 @@
                                             <td>{{ $user->dept->name or '' }}</td>
                                             <td>早餐：{{$user->price->breakfast or ''}} 午餐：{{$user->price->lunch or ''}} 晚餐：{{$user->price->dinner or ''}}</td>
                                             <td>
-                                                <a href="{{ url('order/user/'.$user->id.'/edit') }}" class="btn btn-info">状态设置</a>
-                                                <a href="{{ url('order/user/'.$user->id.'/edit') }}" class="btn btn-info">暂时开停</a>
+                                                <a href="{{ url('staff/order/'.$user->id.'/edit') }}" class="btn btn-info">状态设置</a>
+                                                <a href="{{ url('staff/order/'.$user->id.'/edit') }}" class="btn btn-info">暂时开停</a>
                                             </td>
                                         </tr>
                                     @endforeach

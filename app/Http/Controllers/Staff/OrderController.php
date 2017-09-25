@@ -40,4 +40,9 @@ class OrderController extends Controller
 
         return view('staff.order.index', ['users' => $users, 'depts' => Dept::all()]);
     }
+
+    public function edit($id)
+    {
+        return view('staff.order.edit', ['user' => User::findOrFail($id)]);
+    }
 }

@@ -13,6 +13,7 @@
     <!-- Styles -->
 {{--    <link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
     <link href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}" rel="stylesheet">
+    @yield('css')
 </head>
 <body style="background-color:whitesmoke">
     <div id="app">
