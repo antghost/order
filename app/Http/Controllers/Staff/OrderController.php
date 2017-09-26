@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Dept;
 use App\User;
+use App\Models\UserOrderStatus;
 
 class OrderController extends Controller
 {
@@ -54,8 +55,33 @@ class OrderController extends Controller
 
     public function update(Request $request, $id)
     {
-        $breakfast = ($request->input('breakfast_chk'));
-        dd($breakfast);
+        //早餐状态
+        $breakfast = $request->input('breakfast_chk') ? 1 : 0;
+        $breakfastBeginDate = $request->input('breakfast_begin_date');
+        //午餐状态
+        $lunch = $request->input('lunch_chk') ? 1 : 0;
+        $lunchBeginDate = $request->input('lunch_begin_date');
+        //晚餐状态
+        $dinner = $request->input('dinner_chk') ? 1 : 0;
+        $dinnerBeginDate = $request->input('dinner_begin_date');
+
+        $user = User::findOrFail($id);
+
+        //早餐停开餐处理
+        if ($breakfast) {
+            dd($breakfastBeginDate);
+        } else {
+            dd('stop');
+        }
+
+        $userOrderStatuses = UserOrderStatus::updateOrCreate(
+            //第一个参数数组中必须是unique,否则更新将失效
+            ['user_id' => $id],
+            //第二个参数为更新/创建的值
+            ['breakfast' => $breakfast, 'lunch' => $lunch, 'dinner' => $dinner]
+            );
+
+        dd($userOrderStatuses);
     }
 
 }

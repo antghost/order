@@ -87,26 +87,26 @@
 @section('script')
     <script src="{{ asset('bootstrap-switch\js\bootstrap-switch.min.js') }}"></script>
     <script>
-        $('#breakfast_switch').bootstrapSwitch({
+        $('#breakfast_switch, #lunch_switch, #dinner_switch').bootstrapSwitch({
             onText: "开",
             offText: "停",
             onSwitchChange: function (event, state) {
 
             }
         });
-        $('#lunch_switch').bootstrapSwitch({
-            onText: "开",
-            offText: "停",
-            onSwitchChange: function (event, state) {
-
-            }
-        });
-        $('#dinner_switch').bootstrapSwitch({
-            onText: "开",
-            offText: "停",
-            onSwitchChange: function (event, state) {
-
-            }
-        });
+//        $('#lunch_switch').bootstrapSwitch({
+//            onText: "开",
+//            offText: "停",
+//            onSwitchChange: function (event, state) {
+//
+//            }
+//        });
+//        $('#dinner_switch').bootstrapSwitch({
+//            onText: "开",
+//            offText: "停",
+//            onSwitchChange: function (event, state) {
+//
+//            }
+//        });
     </script>
 @endsection

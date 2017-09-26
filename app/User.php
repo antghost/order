@@ -54,4 +54,67 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\PriceUser');
     }
+
+    /**
+     * 用户用餐状态
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function userOrderStatuses()
+    {
+        return $this->hasOne('App\Models\UserOrderStatus');
+    }
+
+    /**
+     * 用户早餐开餐记录
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function bookBreakfast()
+    {
+        return $this->hasMany('App\Models\BookBreakfast');
+    }
+
+    /**
+     * 用户午餐开餐记录
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function bookLunch()
+    {
+        return $this->hasMany('App\Models\BookLunch');
+    }
+
+    /**
+     * 用户晚餐开餐记录
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function bookDinner()
+    {
+        return $this->hasMany('App\Models\BookDinner');
+    }
+
+    /**
+     * 用户早餐停餐记录
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cancelBreakfast()
+    {
+        return $this->hasMany('App\Models\CancelBreakfast');
+    }
+
+    /**
+     * 用户午餐停餐记录
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cancelLunch()
+    {
+        return $this->hasMany('App\Models\CancelLunch');
+    }
+
+    /**
+     * 用户晚餐停餐记录
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function CancelDinner()
+    {
+        return $this->hasMany('App\Models\cancelDinner');
+    }
 }
