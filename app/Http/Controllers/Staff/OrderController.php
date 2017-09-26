@@ -9,6 +9,9 @@ use App\User;
 
 class OrderController extends Controller
 {
+    /**
+     * 首页
+     */
     public function index()
     {
         return view('staff.order.index', [ 'depts' => Dept::all(), 'users' => User::paginate(15)]);
@@ -41,8 +44,18 @@ class OrderController extends Controller
         return view('staff.order.index', ['users' => $users, 'depts' => Dept::all()]);
     }
 
+    /**
+     *显示编辑页面
+     */
     public function edit($id)
     {
         return view('staff.order.edit', ['user' => User::findOrFail($id)]);
     }
+
+    public function update(Request $request, $id)
+    {
+        $breakfast = ($request->input('breakfast_chk'));
+        dd($breakfast);
+    }
+
 }

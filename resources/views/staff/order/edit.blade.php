@@ -12,7 +12,9 @@
 
             <div class="col-md-9 col-md-offset-0">
                 <div class="col-md-12" style="background-color: white">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" action="{{ url('staff/order/'.$user->id) }}" method="post">
+                        {{ csrf_field() }}
+                        {{ method_field('PUT') }}
                         <div class="form-group">
                             <label class="control-label col-md-2">姓名：</label>
                             <div class="col-md-5">
@@ -29,27 +31,40 @@
 
                         <div class="form-group">
                             <label class="control-label col-md-2">早餐：</label>
+                            <div class="col-md-2">
+                                <input id="breakfast_switch" name="breakfast_chk" type="checkbox" >
+                            </div>
+                            <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <div class="switch" data-on-label="SI" data-off-label="NO">
-                                    <input type="checkbox" checked />
-                                </div>
+                                <input type="datetime" class="form-control" name="breakfast_begin_date" id="breakfast_begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-2">午餐：</label>
+                            <div class="col-md-2">
+                                <input id="lunch_switch" name="lunch_chk" type="checkbox" >
+                            </div>
+                            <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input class="mySwitch" type="checkbox" />
+                                <input type="datetime" class="form-control" name="lunch_begin_date" id="lunch_begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" >
                             </div>
                         </div>
 
                         <div class="form-group">
+                            <label class="control-label col-md-2">晚餐：</label>
+                            <div class="col-md-2">
+                                <input id="dinner_switch" name="dinner_chk" type="checkbox" >
+                            </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="begin_date" id="begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" disabled>
+                                <input type="datetime" class="form-control" name="dinner_begin_date" id="dinner_begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" >
                             </div>
-                            <div class="col-md-5">
-                                <button type="submit" name="submit" class="btn btn-primary" disabled>修改</button>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-2 text-right">
+                                <button type="submit" name="submit" class="btn btn-primary">提交</button>
                             </div>
                         </div>
                     </form>
@@ -72,11 +87,25 @@
 @section('script')
     <script src="{{ asset('bootstrap-switch\js\bootstrap-switch.min.js') }}"></script>
     <script>
-        $('.mySwitch').bootstrapSwitch({
+        $('#breakfast_switch').bootstrapSwitch({
             onText: "开",
             offText: "停",
             onSwitchChange: function (event, state) {
-                $('#begin_date').prop('disabled', !state);
+
+            }
+        });
+        $('#lunch_switch').bootstrapSwitch({
+            onText: "开",
+            offText: "停",
+            onSwitchChange: function (event, state) {
+
+            }
+        });
+        $('#dinner_switch').bootstrapSwitch({
+            onText: "开",
+            offText: "停",
+            onSwitchChange: function (event, state) {
+
             }
         });
     </script>
