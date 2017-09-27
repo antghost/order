@@ -4,6 +4,8 @@ namespace App\Http\Controllers\staff;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use App\Models\Dept;
 use App\User;
 use App\Models\UserOrderStatus;
@@ -65,13 +67,110 @@ class OrderController extends Controller
         $dinner = $request->input('dinner_chk') ? 1 : 0;
         $dinnerBeginDate = $request->input('dinner_begin_date');
 
+        $breakfastEndDate = Carbon::parse($breakfastBeginDate)->subDay();
+        $lunchEndDate = Carbon::parse($lunchBeginDate)->subDay();
+        $dinnerEndDate = Carbon::parse($dinnerBeginDate)->subDay();
+
         $user = User::findOrFail($id);
 
-        //早餐停开餐处理
-        if ($breakfast) {
-            dd($breakfastBeginDate);
+        //DB::beginTransaction();
+        //停开餐处理
+        if ( isset($user->userOrderStatuses)
+            && ( isset($user->bookBreakfast) || isset($user->cancelBreakfast) )
+            && ( isset($user->bookLunch) || isset($user->cancelLunch) )
+            && ( isset($user->bookDinner) || isset($user->cancelDinner) ) ){
+            //早餐开餐状态变停餐状态处理
+            if ($user->userOrderStatuses->breakfast && empty($breakfast)) {
+                //失效开餐记录
+                $user->bookBreakfast()->whereNull('end_date')->update(['end_date' => $breakfastEndDate]);
+                //增加停餐记录
+                $user->cancelBreakfast()->create([
+                    'begin_date' => $breakfastBeginDate,
+                ]);
+            }
+            //早餐停餐状态变开餐状态处理
+            if (!$user->userOrderStatuses->breakfast && !empty($breakfast)) {
+                //失效停餐记录
+                $user->cancelBreakfast()->whereNull('end_date')->update(['end_date' => $breakfastEndDate]);
+                //增加开餐记录
+                $user->bookBreakfast()->create([
+                    'begin_date' => $breakfastBeginDate,
+                ]);
+            }
+            //午餐开餐状态变停餐状态处理
+            if ($user->userOrderStatuses->lunch && empty($lunch)) {
+                //失效开餐记录
+                $user->bookLunch()->whereNull('end_date')->update(['end_date' => $lunchEndDate]);
+                //增加停餐记录
+                $user->cancelLunch()->create([
+                    'begin_date' => $lunchBeginDate,
+                ]);
+            }
+            //午餐停餐状态变开餐状态处理
+            if (!$user->userOrderStatuses->lunch && !empty($lunch)) {
+                //失效停餐记录
+                $user->cancelLunch()->whereNull('end_date')->update(['end_date' => $lunchEndDate]);
+                //增加开餐记录
+                $user->bookLunch()->create([
+                    'begin_date' => $lunchBeginDate,
+                ]);
+            }
+            //晚餐开餐状态变停餐状态处理
+            if ($user->userOrderStatuses->dinner && empty($dinner)) {
+                //失效开餐记录
+                $user->bookDinner()->whereNull('end_date')->update(['end_date' => $dinnerEndDate]);
+                //增加停餐记录
+                $user->cancelDinner()->create([
+                    'begin_date' => $dinnerBeginDate,
+                ]);
+            }
+            //晚餐停餐状态变开餐状态处理
+            if (!$user->userOrderStatuses->dinner && !empty($dinner)) {
+                //失效停餐记录
+                $user->cancelDinner()->whereNull('end_date')->update(['end_date' => $dinnerEndDate]);
+                //增加开餐记录
+                $user->bookDinner()->create([
+                    'begin_date' => $dinnerBeginDate,
+                ]);
+            }
+
         } else {
-            dd('stop');
+            //早餐停开餐处理
+            if ($breakfast) {
+                //增加开餐记录
+                $user->bookBreakfast()->create([
+                    'begin_date' => $breakfastBeginDate,
+                ]);
+            } else {
+                //增加停餐记录
+                $user->cancelBreakfast()->create([
+                    'begin_date' => $breakfastBeginDate,
+                ]);
+            }
+            //午餐停开餐处理
+            if ($breakfast) {
+                //增加开餐记录
+                $user->bookLunch()->create([
+                    'begin_date' => $lunchBeginDate,
+                ]);
+            } else {
+                //增加停餐记录
+                $user->cancelLunch()->create([
+                    'begin_date' => $lunchBeginDate,
+                ]);
+            }
+            //晚餐停开餐处理
+            if ($breakfast) {
+                //增加开餐记录
+                $user->bookDinner()->create([
+                    'begin_date' => $dinnerBeginDate,
+                ]);
+            } else {
+                //增加停餐记录
+                $user->cancelDinner()->create([
+                    'begin_date' => $dinnerBeginDate,
+                ]);
+            }
         }
 
         $userOrderStatuses = UserOrderStatus::updateOrCreate(
@@ -81,7 +180,7 @@ class OrderController extends Controller
             ['breakfast' => $breakfast, 'lunch' => $lunch, 'dinner' => $dinner]
             );
 
-        dd($userOrderStatuses);
+        return redirect()->back()->with('status', '处理完成');
     }
 
 }
