@@ -68,7 +68,7 @@ class User extends Authenticatable
      * 用户早餐开餐记录
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function bookBreakfast()
+    public function bookBreakfasts()
     {
         return $this->hasMany('App\Models\BookBreakfast');
     }
@@ -77,7 +77,7 @@ class User extends Authenticatable
      * 用户午餐开餐记录
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function bookLunch()
+    public function bookLunches()
     {
         return $this->hasMany('App\Models\BookLunch');
     }
@@ -86,7 +86,7 @@ class User extends Authenticatable
      * 用户晚餐开餐记录
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function bookDinner()
+    public function bookDinners()
     {
         return $this->hasMany('App\Models\BookDinner');
     }
@@ -95,7 +95,7 @@ class User extends Authenticatable
      * 用户早餐停餐记录
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function cancelBreakfast()
+    public function cancelBreakfasts()
     {
         return $this->hasMany('App\Models\CancelBreakfast');
     }
@@ -104,7 +104,7 @@ class User extends Authenticatable
      * 用户午餐停餐记录
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function cancelLunch()
+    public function cancelLunches()
     {
         return $this->hasMany('App\Models\CancelLunch');
     }
@@ -113,7 +113,7 @@ class User extends Authenticatable
      * 用户晚餐停餐记录
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function CancelDinner()
+    public function CancelDinners()
     {
         return $this->hasMany('App\Models\cancelDinner');
     }

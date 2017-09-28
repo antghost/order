@@ -1,4 +1,4 @@
-<div class="col-md-2">
+<div class="col-md-2" style="background-color: white">
     <ul class="nav nav-pills nav-stacked ">
         <li role="presentation" {{ $index or '' }}><a href="{{ url('user') }}">概况</a></li>
         <li role="presentation" {{ $breakfast or '' }}><a href="{{ url('user/breakfast/create') }}">用餐设置</a></li>

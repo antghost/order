@@ -11,6 +11,25 @@
             @endcomponent
 
             <div class="col-md-9 col-md-offset-0">
+
+                <div class="col-md-12">
+                        @if (session('status'))
+                            <div class="alert alert-success">
+                                {{ session('status') }}
+                            </div>
+                        @endif
+
+                        @if(count($errors) > 0)
+                            <div class="alert alert-warning">
+                                <ul>
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                </div>
+
                 <div class="col-md-12" style="background-color: white">
                     <form class="form-horizontal" action="{{ url('staff/order/'.$user->id) }}" method="post">
                         {{ csrf_field() }}
@@ -32,33 +51,45 @@
                         <div class="form-group">
                             <label class="control-label col-md-2">早餐：</label>
                             <div class="col-md-2">
-                                <input id="breakfast_switch" name="breakfast_chk" type="checkbox" >
+                                <input id="breakfast_switch" name="breakfast_chk" type="checkbox"
+                                    @if (isset($user->userorderstatuses) && $user->userorderstatuses->breakfast)
+                                        checked
+                                    @endif
+                                >
                             </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="breakfast_begin_date" id="breakfast_begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" >
+                                <input type="datetime" class="form-control" name="breakfast_begin_date" id="breakfast_begin_date" required value="{{ \Carbon\Carbon::today() }}" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-2">午餐：</label>
                             <div class="col-md-2">
-                                <input id="lunch_switch" name="lunch_chk" type="checkbox" >
+                                <input id="lunch_switch" name="lunch_chk" type="checkbox"
+                                    @if (isset($user->userorderstatuses) && $user->userorderstatuses->lunch)
+                                        checked
+                                    @endif
+                                >
                             </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="lunch_begin_date" id="lunch_begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" >
+                                <input type="datetime" class="form-control" name="lunch_begin_date" id="lunch_begin_date" required value="{{ \Carbon\Carbon::today() }}" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="control-label col-md-2">晚餐：</label>
                             <div class="col-md-2">
-                                <input id="dinner_switch" name="dinner_chk" type="checkbox" >
+                                <input id="dinner_switch" name="dinner_chk" type="checkbox"
+                                    @if (isset($user->userorderstatuses) && $user->userorderstatuses->dinner)
+                                        checked
+                                    @endif
+                                >
                             </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="dinner_begin_date" id="dinner_begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}" >
+                                <input type="datetime" class="form-control" name="dinner_begin_date" id="dinner_begin_date" required value="{{ \Carbon\Carbon::today() }}" >
                             </div>
                         </div>
 
@@ -70,15 +101,69 @@
                     </form>
                 </div>
 
-                <div class="panel panel-info">
-                    <div class="panel-body">
-                        @if (session('status'))
-                            <div class="alert alert-success">
-                                {{ session('status') }}
-                            </div>
-                        @endif
-                    </div>
+                <!--早餐流水 -->
+                <div class="col-md-12" style="background-color: white; margin-top: 10px">
+                    <span>早餐流水</span>
+                    <table class="table">
+                        <thead>
+                        <th>开始日期</th>
+                        <th>结束日期</th>
+                        <th>类型</th>
+                        </thead>
+                        <tbody>
+                        @foreach($user->bookbreakfasts as $breakfast)
+                            <tr>
+                                <td>{{ $breakfast->begin_date or '' }}</td>
+                                <td>{{ $breakfast->end_date or '长期' }}</td>
+                                {{--<td>{{ $breakfast->type or '' }}</td>--}}
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
                 </div>
+
+                <!--午餐流水 -->
+                <div class="col-md-12" style="background-color: white; margin-top: 10px">
+                    <span>午餐流水</span>
+                    <table class="table">
+                        <thead>
+                        <th>开始日期</th>
+                        <th>结束日期</th>
+                        <th>类型</th>
+                        </thead>
+                        <tbody>
+                        @foreach($user->booklunches as $breakfast)
+                            <tr>
+                                <td>{{ $breakfast->begin_date or '' }}</td>
+                                <td>{{ $breakfast->end_date or '长期' }}</td>
+                                {{--<td>{{ $breakfast->type or '' }}</td>--}}
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--晚餐流水 -->
+                <div class="col-md-12" style="background-color: white; margin-top: 10px">
+                    <span>晚餐流水</span>
+                    <table class="table">
+                        <thead>
+                        <th>开始日期</th>
+                        <th>结束日期</th>
+                        <th>类型</th>
+                        </thead>
+                        <tbody>
+                        @foreach($user->bookdinners as $breakfast)
+                            <tr>
+                                <td>{{ $breakfast->begin_date or '' }}</td>
+                                <td>{{ $breakfast->end_date or '长期' }}</td>
+                                {{--<td>{{ $breakfast->type or '' }}</td>--}}
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
