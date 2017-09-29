@@ -59,8 +59,14 @@
                                         <tr>
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->dept->name or '' }}</td>
-                                            <td>早餐：{{$user->userOrderStatuses->breakfast or '' ? '开' : '停'}} <br>午餐：{{$user->userOrderStatuses->lunch or '' ? '开' : '停'}} <br>晚餐：{{$user->userOrderStatuses->dinner or '' ? '开' : '停'}}</td>
-                                            <td>早餐：{{$user->price->breakfast or ''}} <br>午餐：{{$user->price->lunch or ''}} <br>晚餐：{{$user->price->dinner or ''}}</td>
+                                            <td>早餐：{{$user->userOrderStatuses->breakfast or '' ? '开' : '停'}} <br>
+                                                午餐：{{$user->userOrderStatuses->lunch or '' ? '开' : '停'}} <br>
+                                                晚餐：{{$user->userOrderStatuses->dinner or '' ? '开' : '停'}}
+                                            </td>
+                                            <td>早餐：{{$user->price->breakfast or ''}} <br>
+                                                午餐：{{$user->price->lunch or ''}} <br>
+                                                晚餐：{{$user->price->dinner or ''}}
+                                            </td>
                                             <td>
                                                 <a href="{{ url('staff/order/'.$user->id.'/edit') }}" class="btn btn-info">状态设置</a>
                                                 <a href="{{ url('staff/order/'.$user->id.'/edit') }}" class="btn btn-info">临时开停</a>
