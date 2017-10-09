@@ -49,10 +49,37 @@ class OrderController extends Controller
 
     /**
      *显示编辑页面
+     *
+    create view v_breakfasts as
+    select user_id,begin_date, end_date, '开餐' as type from book_breakfasts
+    union
+    select user_id,begin_date, end_date, '停餐' as type from cancel_breakfasts
+    ;
+
+    create view v_lunches as
+    select user_id,begin_date, end_date, '开餐' as type from book_lunches
+    union
+    select user_id,begin_date, end_date, '停餐' as type from cancel_lunches
+    ;
+
+    create view v_dinners as
+    select user_id,begin_date, end_date, '开餐' as type from book_dinners
+    union
+    select user_id,begin_date, end_date, '停餐' as type from cancel_dinners
+    ;
      */
     public function edit($id)
     {
-        return view('staff.order.edit', ['user' => User::findOrFail($id)]);
+        $user = User::findOrFail($id);
+        $breakfasts = DB::table('v_breakfasts')->where('user_id',$id)->orderBy('begin_date')->get();
+        $lunches = DB::table('v_lunches')->where('user_id',$id)->orderBy('begin_date')->get();
+        $dinners = DB::table('v_dinners')->where('user_id',$id)->orderBy('begin_date')->get();
+        return view('staff.order.edit', [
+            'user' => $user,
+            'breakfasts' => $breakfasts,
+            'lunches' => $lunches,
+            'dinners' => $dinners,
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -78,12 +105,22 @@ class OrderController extends Controller
 
         $user = User::findOrFail($id);
 
+//        dd('userOrderStatuses:',isset($user->userOrderStatuses),
+//            'bookBreakfast:',!$user->bookBreakfasts()->get()->isEmpty()
+//            ,'cancelBreakfast:',!$user->cancelBreakfasts()->get()->isEmpty()
+//            ,'bookLunch:',!$user->bookLunches()->get()->isEmpty()
+//            ,'cancelLunch:',!$user->cancelLunches()->get()->isEmpty()
+//            ,'bookDinner:',!$user->bookDinners()->get()->isEmpty()
+//            ,'cancelDinner:',!$user->cancelDinners()->get()->isEmpty()
+//        );
+
         DB::beginTransaction();
+
         //停开餐处理
         if ( isset($user->userOrderStatuses)
-            && ( isset($user->bookBreakfast) || isset($user->cancelBreakfast) )
-            && ( isset($user->bookLunch) || isset($user->cancelLunch) )
-            && ( isset($user->bookDinner) || isset($user->cancelDinner) ) ){
+            && ( !$user->bookBreakfasts()->get()->isEmpty() || !$user->cancelBreakfasts()->get()->isEmpty() )
+            && ( !$user->bookLunches()->get()->isEmpty() || !$user->cancelLunches()->get()->isEmpty() )
+            && ( !$user->bookDinners()->get()->isEmpty() || !$user->cancelDinners()->get()->isEmpty() )){
             //早餐开餐状态变停餐状态处理
             if ($user->userOrderStatuses->breakfast && empty($breakfast)) {
                 //失效开餐记录
@@ -165,7 +202,7 @@ class OrderController extends Controller
                 ]);
             }
             //晚餐停开餐处理
-            if ($breakfast) {
+            if ($dinner) {
                 //增加开餐记录
                 $bookDinner = $user->bookDinners()->create([
                     'begin_date' => $dinnerBeginDate,
@@ -179,16 +216,16 @@ class OrderController extends Controller
         }
 
         $userOrderStatuses = UserOrderStatus::updateOrCreate(
-            //第一个参数数组中必须是unique,否则更新将失效
+        //第一个参数数组中必须是unique,否则更新将失效
             ['user_id' => $id],
             //第二个参数为更新/创建的值
             ['breakfast' => $breakfast, 'lunch' => $lunch, 'dinner' => $dinner]
-            );
+        );
 
         if (isset($userOrderStatuses)
-            && (isset($bookBreakfast) || isset($cancelBreakfast))
-            && (isset($bookLunch) || isset($cancelLunch))
-            && (isset($bookDinner) || isset($cancelDinner))){
+            && (isset($bookBreakfast) || isset($cancelBreakfast)
+             || isset($bookLunch) || isset($cancelLunch)
+             || isset($bookDinner) || isset($cancelDinner))){
             DB::commit();
             return redirect()->back()->with('status', '处理完成');
         } else {

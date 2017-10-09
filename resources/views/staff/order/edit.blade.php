@@ -111,11 +111,11 @@
                         <th>类型</th>
                         </thead>
                         <tbody>
-                        @foreach($user->bookbreakfasts as $breakfast)
+                        @foreach($breakfasts as $breakfast)
                             <tr>
                                 <td>{{ $breakfast->begin_date or '' }}</td>
                                 <td>{{ $breakfast->end_date or '长期' }}</td>
-                                {{--<td>{{ $breakfast->type or '' }}</td>--}}
+                                <td>{{ $breakfast->type or '' }}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -132,11 +132,11 @@
                         <th>类型</th>
                         </thead>
                         <tbody>
-                        @foreach($user->booklunches as $breakfast)
+                        @foreach($lunches as $lunch)
                             <tr>
-                                <td>{{ $breakfast->begin_date or '' }}</td>
-                                <td>{{ $breakfast->end_date or '长期' }}</td>
-                                {{--<td>{{ $breakfast->type or '' }}</td>--}}
+                                <td>{{ $lunch->begin_date or '' }}</td>
+                                <td>{{ $lunch->end_date or '长期' }}</td>
+                                <td>{{ $lunch->type or '' }}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -153,11 +153,11 @@
                         <th>类型</th>
                         </thead>
                         <tbody>
-                        @foreach($user->bookdinners as $breakfast)
+                        @foreach($dinners as $dinner)
                             <tr>
-                                <td>{{ $breakfast->begin_date or '' }}</td>
-                                <td>{{ $breakfast->end_date or '长期' }}</td>
-                                {{--<td>{{ $breakfast->type or '' }}</td>--}}
+                                <td>{{ $dinner->begin_date or '' }}</td>
+                                <td>{{ $dinner->end_date or '长期' }}</td>
+                                <td>{{ $dinner->type or '' }}</td>
                             </tr>
                         @endforeach
                         </tbody>

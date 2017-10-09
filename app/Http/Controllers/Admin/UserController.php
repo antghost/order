@@ -63,6 +63,7 @@ class UserController extends Controller
             'active' => 1,
             'is_admin' => 0,
             'dept_id' => $request->input('dept'),
+            'price_id' => $request->input('price'),
             'password' => bcrypt($request->input('password')),
         ]);
 
@@ -87,6 +88,7 @@ class UserController extends Controller
                 return redirect('admin/user');
             } else {
                 DB::rollBack();
+                return redirect()->back()->withInput()->withErrors('提交失败');
             }
 
         } else {
