@@ -4,6 +4,9 @@ namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\BookBreakfast;
+use App\Models\CancelBreakfast;
 
 class BreakfastController extends Controller
 {
@@ -19,6 +22,12 @@ class BreakfastController extends Controller
 
     public function create()
     {
-        return view('user.breakfast.create');
+        $id = Auth::user()->id;
+        $bookBreakfast = BookBreakfast::find($id);
+        $cancelBreakfast = CancelBreakfast::find($id);
+        return view('user.breakfast.create',[
+            'bookBreakfast' => $bookBreakfast,
+            'cancelBreakfast' => $cancelBreakfast,
+        ]);
     }
 }

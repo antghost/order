@@ -17,7 +17,7 @@
 </head>
 <body style="background-color:whitesmoke">
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
+        <nav class="navbar navbar-default navbar-static-top" style="background-color: white">
             <div class="container">
                 <div class="navbar-header">
 
