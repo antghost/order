@@ -37,83 +37,91 @@
                             <div class="alert alert-info" style="margin-top: 10px">
                                 <p>早餐需提前一天设置。（长期开餐或停餐请联系餐厅负责部门设置）</p>
                             </div>
-                            <span>开餐设置</span>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>开始日期</th>
-                                    <th>结束日期</th>
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @if (Auth::user()->userOrderStatuses->breakfast)
+                            <form action="{{ url('user/breakfast') }}" method="post">
+                                {{ csrf_field() }}
+                                <input type="hidden" name="type" value="book">
+                                <span>开餐设置</span>
+                                <table class="table">
+                                    <thead>
                                     <tr>
-                                        <td>{{ $bookBreakfast->begin_date or '' }}</td>
-                                        <td>{{ $bookBreakfast->end_date or '长期' }}</td>
-                                        <td>
-                                            <p>长期开餐或停餐请联系餐厅负责部门设置</p>
-                                        </td>
+                                        <th>开始日期</th>
+                                        <th>结束日期</th>
+                                        <th>操作</th>
                                     </tr>
-                                @else
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="book_time" required
-                                                   value=""
-                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="cancel_time" required
-                                                   value=""
-                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
-                                        </td>
-                                        <td>
-                                            <button type="submit" class="btn btn-info">保存</button>
-                                        </td>
-                                    </tr>
-                                @endif
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    @if (Auth::user()->userOrderStatuses->breakfast)
+                                        <tr>
+                                            <td>{{ $bookBreakfast->begin_date or '' }}</td>
+                                            <td>{{ $bookBreakfast->end_date or '长期' }}</td>
+                                            <td>
+                                                <p>长期开餐或停餐请联系餐厅负责部门设置</p>
+                                            </td>
+                                        </tr>
+                                    @else
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="book_time" required
+                                                       value=""
+                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                            </td>
+                                            <td>
+                                                <input type="text" name="cancel_time" required
+                                                       value=""
+                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                            </td>
+                                            <td>
+                                                <button type="submit" class="btn btn-info">保存</button>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                    </tbody>
+                                </table>
+                            </form>
                         </div>
 
                         <div class="col-md-12">
-                            <span>停餐设置</span>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>开始日期</th>
-                                    <th>结束日期</th>
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @if (isset($cancelBreakfast))
+                            <form action="{{ url('user/breakfast') }}" method="post">
+                                {{ csrf_field() }}
+                                <input type="hidden" name="type" value="cancel">
+                                <span>停餐设置</span>
+                                <table class="table">
+                                    <thead>
                                     <tr>
-                                        <td>{{ $cancelBreakfast->begin_date or '' }}</td>
-                                        <td>{{ $cancelBreakfast->end_date or '长期' }}</td>
-                                        <td>
-                                            <p>长期开餐或停餐请联系餐厅负责部门设置</p>
-                                        </td>
+                                        <th>开始日期</th>
+                                        <th>结束日期</th>
+                                        <th>操作</th>
                                     </tr>
-                                @else
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="book_time" required
-                                                   value=""
-                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="cancel_time" required
-                                                   value=""
-                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
-                                        </td>
-                                        <td>
-                                            <button type="submit" class="btn btn-info">保存</button>
-                                        </td>
-                                    </tr>
-                                @endif
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    @if (isset($cancelBreakfast))
+                                        <tr>
+                                            <td>{{ $cancelBreakfast->begin_date or '' }}</td>
+                                            <td>{{ $cancelBreakfast->end_date or '长期' }}</td>
+                                            <td>
+                                                <p>长期开餐或停餐请联系餐厅负责部门设置</p>
+                                            </td>
+                                        </tr>
+                                    @else
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="book_time" required
+                                                       value=""
+                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                            </td>
+                                            <td>
+                                                <input type="text" name="cancel_time" required
+                                                       value=""
+                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                            </td>
+                                            <td>
+                                                <button type="submit" class="btn btn-info">保存</button>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                    </tbody>
+                                </table>
+                            </form>
                         </div>
                     </div>
                 </div>

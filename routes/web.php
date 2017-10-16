@@ -21,8 +21,9 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['namespace' => 'User', 'prefix' => 'user', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
     //早餐
-    Route::get('/breakfast', 'BreakfastController@index');
-    Route::get('/breakfast/create', 'BreakfastController@create');
+    Route::resource('/breakfast', 'BreakfastController');
+    Route::resource('/lunch', 'LunchController');
+    Route::resource('/dinner', 'DinnerController');
     Route::get('/profile', 'ProfileController@index');
 });
 
