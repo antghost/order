@@ -61,14 +61,22 @@
                                     @else
                                         <tr>
                                             <td>
-                                                <input type="text" name="book_time" required
-                                                       value=""
-                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                                <input type="hidden" name="id" value="{{ $bookBreakfast->id or '' }}">
+                                                <input type="text" id="book_begin_date" name="begin_date" required
+                                                       value="{{ $bookBreakfast->begin_date or '' }}"
+                                                       onclick="WdatePicker({
+                                                       dateFmt:'yyyy-MM-dd',
+                                                       minDate:'%y-%M-{%d+1}',
+                                                       maxDate:'#F{$dp.$D(\'book_end_date\')}'
+                                                       })">
                                             </td>
                                             <td>
-                                                <input type="text" name="cancel_time" required
-                                                       value=""
-                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                                <input type="text" id="book_end_date" name="end_date" required
+                                                       value="{{ $bookBreakfast->end_date or '' }}"
+                                                       onclick="WdatePicker({
+                                                       dateFmt:'yyyy-MM-dd',
+                                                       minDate:'#F{\'%y-%M-{%d+1}\'||$dp.$D(\'book_begin_date\')}'
+                                                       })">
                                             </td>
                                             <td>
                                                 <button type="submit" class="btn btn-info">保存</button>
@@ -94,7 +102,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if (isset($cancelBreakfast))
+                                    @if (!Auth::user()->userOrderStatuses->breakfast)
                                         <tr>
                                             <td>{{ $cancelBreakfast->begin_date or '' }}</td>
                                             <td>{{ $cancelBreakfast->end_date or '长期' }}</td>
@@ -105,14 +113,22 @@
                                     @else
                                         <tr>
                                             <td>
-                                                <input type="text" name="book_time" required
-                                                       value=""
-                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                                <input type="hidden" name="id" value="{{ $cancelBreakfast->id or '' }}">
+                                                <input type="text" id="cancel_begin_date" name="begin_date" required
+                                                       value="{{ $cancelBreakfast->begin_date or '' }}"
+                                                       onclick="WdatePicker({
+                                                       dateFmt:'yyyy-MM-dd',
+                                                       minDate:'%y-%M-{%d+1}',
+                                                       maxDate:'#F{$dp.$D(\'cancel_end_date\')}'
+                                                       })">
                                             </td>
                                             <td>
-                                                <input type="text" name="cancel_time" required
-                                                       value=""
-                                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'%y-%M-{%d+1}'})">
+                                                <input type="text" id="cancel_end_date" name="end_date" required
+                                                       value="{{ $cancelBreakfast->end_date or '' }}"
+                                                       onclick="WdatePicker({
+                                                       dateFmt:'yyyy-MM-dd',
+                                                       minDate:'#F{\'%y-%M-{%d+1}\'||$dp.$D(\'cancel_begin_date\')}'
+                                                       })">
                                             </td>
                                             <td>
                                                 <button type="submit" class="btn btn-info">保存</button>
