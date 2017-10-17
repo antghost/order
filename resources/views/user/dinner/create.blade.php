@@ -28,16 +28,16 @@
                         <div class="col-md-12">
                             <ul class="nav nav-tabs">
                                 <li role="presentation" ><a href="{{ url('user/breakfast/create') }}">早餐</a></li>
-                                <li role="presentation" class="active"><a href="#">中餐</a></li>
-                                <li role="presentation" ><a href="{{ url('user/dinner/create') }}">晚餐</a></li>
+                                <li role="presentation" ><a href="{{ url('user/lunch/create') }}">中餐</a></li>
+                                <li role="presentation" class="active"><a href="#">晚餐</a></li>
                             </ul>
                         </div>
 
                         <div class="col-md-12">
                             <div class="alert alert-info" style="margin-top: 10px">
-                                <p>午餐：当天开餐须在{{ $orderTime->book_time or '' }}前，当天停餐须在{{ $orderTime->cancel_time or '' }}前。（长期开餐或停餐请联系餐厅负责部门设置）</p>
+                                <p>晚餐：当天开餐须在{{ $orderTime->book_time or '' }}前，当天停餐须在{{ $orderTime->cancel_time or '' }}前。（长期开餐或停餐请联系餐厅负责部门设置）</p>
                             </div>
-                            <form action="{{ url('user/lunch') }}" method="post">
+                            <form action="{{ url('user/dinner') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="book">
                                 <input type="hidden" name="status" value="{{ $status or ''}}">
@@ -51,10 +51,10 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if (Auth::user()->userOrderStatuses->lunch)
+                                    @if (Auth::user()->userOrderStatuses->dinner)
                                         <tr>
-                                            <td>{{ $bookLunch->begin_date or '' }}</td>
-                                            <td>{{ $bookLunch->end_date or '长期' }}</td>
+                                            <td>{{ $bookDinner->begin_date or '' }}</td>
+                                            <td>{{ $bookDinner->end_date or '长期' }}</td>
                                             <td>
                                                 <p>长期开餐或停餐请联系餐厅负责部门设置</p>
                                             </td>
@@ -62,14 +62,14 @@
                                     @else
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="id" value="{{ $bookLunch->id or '' }}">
+                                                <input type="hidden" name="id" value="{{ $bookDinner->id or '' }}">
                                                 {{--开餐开始日期--}}
                                                 @if ($readonly)
                                                     <input type="text" id="book_begin_date" name="begin_date" required
-                                                           readonly value="{{ $bookLunch->begin_date or '' }}" >
+                                                           readonly value="{{ $bookDinner->begin_date or '' }}" >
                                                 @else
                                                     <input type="text" id="book_begin_date" name="begin_date" required
-                                                           value="{{ $bookLunch->begin_date or '' }}"
+                                                           value="{{ $bookDinner->begin_date or '' }}"
                                                            onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'{{ $bookMinDate }}',
@@ -80,7 +80,7 @@
                                             <td>
                                                 {{--开餐结束日期--}}
                                                 <input type="text" id="book_end_date" name="end_date" required
-                                                       value="{{ $bookLunch->end_date or '' }}"
+                                                       value="{{ $bookDinner->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
@@ -97,7 +97,7 @@
                         </div>
 
                         <div class="col-md-12">
-                            <form action="{{ url('user/lunch') }}" method="post">
+                            <form action="{{ url('user/dinner') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="cancel">
                                 <input type="hidden" name="status" value="{{ $status or '' }}">
@@ -111,10 +111,10 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if (!Auth::user()->userOrderStatuses->lunch)
+                                    @if (!Auth::user()->userOrderStatuses->dinner)
                                         <tr>
-                                            <td>{{ $cancelLunch->begin_date or '' }}</td>
-                                            <td>{{ $cancelLunch->end_date or '长期' }}</td>
+                                            <td>{{ $cancelDinner->begin_date or '' }}</td>
+                                            <td>{{ $cancelDinner->end_date or '长期' }}</td>
                                             <td>
                                                 <p>长期开餐或停餐请联系餐厅负责部门设置</p>
                                             </td>
@@ -122,14 +122,14 @@
                                     @else
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="id" value="{{ $cancelLunch->id or '' }}">
+                                                <input type="hidden" name="id" value="{{ $cancelDinner->id or '' }}">
                                                 {{--停餐开始日期--}}
                                                 @if ($readonly)
                                                     <input type="text" id="cancel_begin_date" name="begin_date" required
-                                                           readonly value="{{ $cancelLunch->begin_date or '' }}">
+                                                           readonly value="{{ $cancelDinner->begin_date or '' }}">
                                                 @else
                                                     <input type="text" id="cancel_begin_date" name="begin_date" required
-                                                           value="{{ $cancelLunch->begin_date or '' }}"
+                                                           value="{{ $cancelDinner->begin_date or '' }}"
                                                            onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'{{ $cancelMinDate }}',
@@ -140,7 +140,7 @@
                                             <td>
                                                 {{--停餐结束日期--}}
                                                 <input type="text" id="cancel_end_date" name="end_date" required
-                                                       value="{{ $cancelLunch->end_date or '' }}"
+                                                       value="{{ $cancelDinner->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'#F{\'{{ $cancelMinDate }}\' || $dp.$D(\'cancel_begin_date\')}'
