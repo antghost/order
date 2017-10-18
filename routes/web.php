@@ -20,6 +20,10 @@ Route::get('/home', 'HomeController@index')->name('home');
 //用户功能
 Route::group(['namespace' => 'User', 'prefix' => 'user', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
+    //搜索功能
+    Route::get('/breakfast/s', 'BreakfastController@s');
+    Route::get('/lunch/s', 'LunchController@s');
+    Route::get('/dinner/s', 'DinnerController@s');
     //早餐
     Route::resource('/breakfast', 'BreakfastController');
     Route::resource('/lunch', 'LunchController');

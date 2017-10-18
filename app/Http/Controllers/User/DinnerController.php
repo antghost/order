@@ -155,4 +155,59 @@ class DinnerController extends Controller
 
         return redirect()->back();
     }
+
+    /**
+     * 搜索
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function s(Request $request)
+    {
+        $request->flashOnly(['begin_date','end_date']);
+
+        $userId = Auth::user()->id;
+        $beginDate = $request->input('begin_date');
+        $endDate = $request->input('end_date');
+        $book = $request->input('book');
+        $cancel = $request->input('cancel');
+
+        $dinners = DB::table('v_dinners')
+            //开始日期
+            ->when($beginDate, function ($query) use ($beginDate){
+                $query->where('begin_date','>=', $beginDate);
+            })
+            //结束日期
+            ->when($endDate, function ($query) use ($endDate){
+                $query->where('end_date','<=', $endDate);
+            });
+
+        //勾选判断
+        if (isset($book) && isset($cancel)){
+//            $dinners = $dinners;
+        } else {
+            $dinners = $dinners
+                //开餐勾选
+                ->when($book, function ($query) {
+                    $query->where('type', '开餐');
+                })
+                //停餐勾选
+                ->when($cancel, function ($query) {
+                    $query->where('type', '停餐');
+                });
+        }
+
+        $dinners = $dinners->where('user_id', $userId)->paginate(15);
+
+        //分页参数
+        $dinners = $dinners->appends([
+            'begin_date' => $beginDate,
+            'end_date' => $endDate,
+        ]);
+        //分页勾选参数
+        if (isset($book)) $dinners = $dinners->appends(['book' => 'on']);
+        if (isset($cancel)) $dinners = $dinners->appends(['cancel' => 'on']);
+
+        return view('user.dinner.index', ['dinners' => $dinners]);
+    }
+    
 }

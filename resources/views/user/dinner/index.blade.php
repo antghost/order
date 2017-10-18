@@ -18,15 +18,15 @@
 
                         <div class="col-md-12">
                             <ul class="nav nav-tabs">
-                                <li role="presentation" class="active"><a href="#">早餐</a></li>
+                                <li role="presentation" ><a href="{{ url('user/breakfast') }}">早餐</a></li>
                                 <li role="presentation" ><a href="{{ url('user/lunch') }}">午餐</a></li>
-                                <li role="presentation" ><a href="{{ url('user/dinner') }}">晚餐</a></li>
+                                <li role="presentation" class="active"><a href="">晚餐</a></li>
                             </ul>
                         </div>
 
                         <div class="col-md-12">
                             <p></p>
-                            <form action="{{ url('user/breakfast/s') }}" class="navbar-form navbar-left" role="search">
+                            <form action="{{ url('user/dinner/s') }}" class="navbar-form navbar-left" role="search">
                                 <div class="form-group">
                                     <label for="startdate">开始日期</label>
                                     <input type="text" id="startdate" name="begin_date" class="form-control"
@@ -68,19 +68,19 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @if(isset($breakfasts))
-                                    @foreach($breakfasts as $breakfast)
+                                @if(isset($dinners))
+                                    @foreach($dinners as $dinner)
                                         <tr>
-                                            <td>{{ $breakfast->begin_date or '' }}</td>
-                                            <td>{{ $breakfast->end_date or '长期' }}</td>
-                                            <td>{{ $breakfast->type or '' }}</td>
+                                            <td>{{ $dinner->begin_date or '' }}</td>
+                                            <td>{{ $dinner->end_date or '长期' }}</td>
+                                            <td>{{ $dinner->type or '' }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
                                 </tbody>
                             </table>
-                            @if (isset($breakfasts))
-                                {{ $breakfasts->links() }}
+                            @if (isset($dinners))
+                                {{ $dinners->links() }}
                                 @endif
                         </div>
                     </div>

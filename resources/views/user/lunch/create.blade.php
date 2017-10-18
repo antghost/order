@@ -28,7 +28,7 @@
                         <div class="col-md-12">
                             <ul class="nav nav-tabs">
                                 <li role="presentation" ><a href="{{ url('user/breakfast/create') }}">早餐</a></li>
-                                <li role="presentation" class="active"><a href="#">中餐</a></li>
+                                <li role="presentation" class="active"><a href="#">午餐</a></li>
                                 <li role="presentation" ><a href="{{ url('user/dinner/create') }}">晚餐</a></li>
                             </ul>
                         </div>
