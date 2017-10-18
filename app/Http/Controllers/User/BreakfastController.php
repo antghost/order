@@ -19,7 +19,9 @@ class BreakfastController extends Controller
 
     public function index(Request $request)
     {
-        return view('user.breakfast.index');
+        $breakfast = Auth::user()->userOrderStatuses->breakfast;
+        $breakfast ? $msg = '当前处于长期开餐状态。' : $msg='当前处于长期停餐状态';
+        return view('user.breakfast.index', ['msg' => $msg]);
     }
 
     /**
@@ -134,6 +136,9 @@ class BreakfastController extends Controller
      */
     public function s(Request $request)
     {
+        $breakfast = Auth::user()->userOrderStatuses->breakfast;
+        $breakfast ? $msg = '当前处于长期开餐状态。' : $msg='当前处于长期停餐状态';
+
         $request->flashOnly(['begin_date','end_date']);
 
         $userId = Auth::user()->id;
@@ -178,6 +183,6 @@ class BreakfastController extends Controller
         if (isset($book)) $breakfasts = $breakfasts->appends(['book' => 'on']);
         if (isset($cancel)) $breakfasts = $breakfasts->appends(['cancel' => 'on']);
 
-        return view('user.breakfast.index', ['breakfasts' => $breakfasts]);
+        return view('user.breakfast.index', ['breakfasts' => $breakfasts, 'msg' => $msg]);
     }
 }

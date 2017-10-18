@@ -14,7 +14,9 @@ class LunchController extends Controller
 {
     public function index()
     {
-        return view('user.lunch.index');
+        $lunch = Auth::user()->userOrderStatuses->lunch;
+        $lunch ? $msg = '当前处于长期开餐状态。' : $msg='当前处于长期停餐状态';
+        return view('user.lunch.index', ['msg' => $msg]);
     }
 
     /**
@@ -109,8 +111,8 @@ class LunchController extends Controller
         //新增或修改开餐记录
         if ($type == 'book'){
             //时限判断，超过时限不能开餐
-            if ( ($status == 'create' && $beginDate == Carbon::today() && date("H:i:s") > $bookTime)
-                || ($status == 'update' && $endDate == Carbon::today() && date("H:i:s") > $bookTime) ){
+            if ( ($status == 'create' && $beginDate->eq(Carbon::today()) && date("H:i:s") > $bookTime)
+                || ($status == 'update' && $endDate->eq(Carbon::today()) && date("H:i:s") > $bookTime) ){
                 return redirect()->back()->withErrors('当天须在 '.$bookTime.' 前开餐')->withInput();
             }
             $bookLunch = BookLunch::updateOrCreate(
@@ -132,8 +134,8 @@ class LunchController extends Controller
         //新增或修改停餐记录
         if ($type == 'cancel'){
             //时限判断，超过时限不能开餐
-            if ( ($status == 'create' && $beginDate == Carbon::today() && date("H:i:s") > $cancelTime)
-                || ($status == 'update' && $endDate == Carbon::today() && date("H:i:s") > $cancelTime) ){
+            if ( ($status == 'create' && $beginDate->eq(Carbon::today()) && date("H:i:s") > $cancelTime)
+                || ($status == 'update' && $endDate->eq(Carbon::today()) && date("H:i:s") > $cancelTime) ){
                 return redirect()->back()->withErrors('当天须在 '.$bookTime.' 前停餐')->withInput();
             }
             $cancelLunch = CancelLunch::updateOrCreate(
@@ -162,6 +164,9 @@ class LunchController extends Controller
      */
     public function s(Request $request)
     {
+        $lunch = Auth::user()->userOrderStatuses->lunch;
+        $lunch ? $msg = '当前处于长期开餐状态。' : $msg='当前处于长期停餐状态';
+
         $request->flashOnly(['begin_date','end_date']);
 
         $userId = Auth::user()->id;
@@ -206,7 +211,7 @@ class LunchController extends Controller
         if (isset($book)) $lunches = $lunches->appends(['book' => 'on']);
         if (isset($cancel)) $lunches = $lunches->appends(['cancel' => 'on']);
 
-        return view('user.lunch.index', ['lunches' => $lunches]);
+        return view('user.lunch.index', ['lunches' => $lunches, 'msg' => $msg]);
     }
     
 }

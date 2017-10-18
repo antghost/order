@@ -14,7 +14,9 @@ class DinnerController extends Controller
 {
     public function index()
     {
-        return view('user.dinner.index');
+        $dinner = Auth::user()->userOrderStatuses->dinner;
+        $dinner ? $msg = '当前处于长期开餐状态。' : $msg='当前处于长期停餐状态';
+        return view('user.dinner.index', ['msg' => $msg]);
     }
 
     /**
@@ -110,8 +112,8 @@ class DinnerController extends Controller
         //新增或修改开餐记录
         if ($type == 'book'){
             //时限判断，超过时限不能开餐
-            if ( ($status == 'create' && $beginDate == Carbon::today() && date("H:i:s") > $bookTime)
-                || ($status == 'update' && $endDate == Carbon::today() && date("H:i:s") > $bookTime) ){
+            if ( ($status == 'create' && $beginDate->eq(Carbon::today()) && date("H:i:s") > $bookTime)
+                || ($status == 'update' && $endDate->eq(Carbon::today()) && date("H:i:s") > $bookTime) ){
                 return redirect()->back()->withErrors('当天须在 '.$bookTime.' 前开餐')->withInput();
             }
             $bookDinner = BookDinner::updateOrCreate(
@@ -133,8 +135,8 @@ class DinnerController extends Controller
         //新增或修改停餐记录
         if ($type == 'cancel'){
             //时限判断，超过时限不能开餐
-            if ( ($status == 'create' && $beginDate == Carbon::today() && date("H:i:s") > $cancelTime)
-                || ($status == 'update' && $endDate == Carbon::today() && date("H:i:s") > $cancelTime) ){
+            if ( ($status == 'create' && $beginDate->eq(Carbon::today()) && date("H:i:s") > $cancelTime)
+                || ($status == 'update' && $endDate->eq(Carbon::today()) && date("H:i:s") > $cancelTime) ){
                 return redirect()->back()->withErrors('当天须在 '.$bookTime.' 前停餐')->withInput();
             }
             $cancelDinner = CancelDinner::updateOrCreate(
@@ -163,6 +165,9 @@ class DinnerController extends Controller
      */
     public function s(Request $request)
     {
+        $dinner = Auth::user()->userOrderStatuses->dinner;
+        $dinner ? $msg = '当前处于长期开餐状态。' : $msg='当前处于长期停餐状态';
+
         $request->flashOnly(['begin_date','end_date']);
 
         $userId = Auth::user()->id;
@@ -207,7 +212,7 @@ class DinnerController extends Controller
         if (isset($book)) $dinners = $dinners->appends(['book' => 'on']);
         if (isset($cancel)) $dinners = $dinners->appends(['cancel' => 'on']);
 
-        return view('user.dinner.index', ['dinners' => $dinners]);
+        return view('user.dinner.index', ['dinners' => $dinners, 'msg' => $msg]);
     }
     
 }

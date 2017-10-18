@@ -24,8 +24,12 @@
                             </ul>
                         </div>
 
+                            <div class="col-md-12 alert alert-info" style="margin-top: 10px;">
+                                <p>{{ $msg or '' }}</p>
+                            </div>
+
                         <div class="col-md-12">
-                            <p></p>
+
                             <form action="{{ url('user/breakfast/s') }}" class="navbar-form navbar-left" role="search">
                                 <div class="form-group">
                                     <label for="startdate">开始日期</label>
