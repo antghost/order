@@ -8,8 +8,8 @@
         <li role="presentation" {{ $staff_limit or '' }}><a href="{{ url('staff/limit') }}">时限设置</a></li>
         <li role="presentation" {{ $staff_order or '' }}><a href="{{ url('staff/order') }}">员工停开餐</a></li>
         <li role="presentation" {{ $staff_price or '' }}><a href="{{ url('staff') }}">缴费设置</a></li>
-        <li role="presentation" {{ $staff_holiday or '' }}><a href="{{ url('staff') }}">假期设置</a></li>
-        <li role="presentation" {{ $staff_notice or '' }}><a href="{{ url('staff') }}">发布通知</a></li>
-        <li role="presentation" {{ $staff_report or '' }}><a href="{{ url('staff') }}">报表</a></li>
+        <li role="presentation" {{ $common_holiday or '' }}><a href="{{ url('common/calendar') }}">假期设置</a></li>
+        <li role="presentation" {{ $common_notice or '' }}><a href="{{ url('staff') }}">发布通知</a></li>
+        <li role="presentation" {{ $common_report or '' }}><a href="{{ url('staff') }}">报表</a></li>
     </ul>
 </div>

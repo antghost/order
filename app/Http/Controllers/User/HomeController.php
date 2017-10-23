@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
@@ -45,5 +46,11 @@ class HomeController extends Controller
             if ($endDay->isWeekend()) $days = $days + 1;
         }
         return $days;
+    }
+
+    private function holidays($startDate, $endDate, $isHoliday = true)
+    {
+        $isHoliday ? $type = 1 : $type = 2 ;
+        DB::table('calendars')->where('type', $type)->get();
     }
 }

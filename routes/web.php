@@ -48,7 +48,7 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth
 });
 
 //管理员功能
-Route::group(['namespace' => 'admin', 'prefix' => 'admin', 'middleware' => 'auth'], function (){
+Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
     Route::resource('/dept', 'DeptController');
     //个人餐费标准历史
@@ -59,4 +59,8 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin', 'middleware' => 'auth
     Route::resource('/user', 'UserController');
     Route::resource('/fee', 'FeeController');
 
+});
+
+Route::group(['namespace' => 'Common', 'prefix' => 'common', 'middleware' => 'auth'], function (){
+    Route::resource('/calendar', 'CalendarController');
 });
