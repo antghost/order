@@ -69,7 +69,12 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2">开始日期：</label>
                                     <div class="col-md-3">
-                                        <input type="datetime" class="form-control" name="begin_date" required value="{{ \Carbon\Carbon::tomorrow() }}">
+                                        <input type="datetime" class="form-control" name="begin_date" required
+                                               value="{{ \Carbon\Carbon::tomorrow()->toDateString() }}"
+                                               onclick="WdatePicker({
+                                                   dateFmt:'yyyy-MM-dd',
+                                                   minDate:'%y-%M-{%d+1}'
+                                               })">
                                     </div>
                                     <div class="col-md-5">
                                         <button type="submit" name="submit" class="btn btn-primary" disabled>修改</button>
@@ -117,6 +122,7 @@
 @endsection
 
 @section('script')
+    <script src="{{asset('My97DatePicker/WdatePicker.js')}}"></script>
     <script src="{{ asset('layer/layer.js') }}"></script>
     <script>
 //        $('button[name=submit]').click(function () {

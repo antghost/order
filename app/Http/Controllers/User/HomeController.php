@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
+use App\Models\Calendar;
 
 class HomeController extends Controller
 {
@@ -22,8 +23,17 @@ class HomeController extends Controller
     public function index()
     {
         //统计当月用餐天数
-        $workday = $this->diffOfDays('2017-10-9','2017-10-12', false);
-        return view('user.home');
+        $startDate = Carbon::today()->startOfMonth()->toDateString();
+        $endDate = Carbon::today()->toDateString();
+
+        $weekdays = $this->diffOfDays($startDate, $endDate );
+        $holidays = $this->diffOfHolidays($startDate, $endDate);
+        $workday = $weekdays - $holidays;
+
+        $user = Auth::user();
+        return view('user.home', [
+            'workday' => $workday,
+        ]);
     }
 
     /**
@@ -48,9 +58,121 @@ class HomeController extends Controller
         return $days;
     }
 
-    private function holidays($startDate, $endDate, $isHoliday = true)
+    /**
+     * 统计两时间段之间的假期天数
+     * @param $startDate
+     * @param $endDate
+     * @return int
+     */
+    private function diffOfHolidays($startDate, $endDate)
     {
-        $isHoliday ? $type = 1 : $type = 2 ;
-        DB::table('calendars')->where('type', $type)->get();
+        //假期
+        $holidays = Calendar::where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+            ['type', '=', 0]
+        ])->get();
+        //补班
+        $workdays = Calendar::where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+            ['type', '=', 1]
+        ])->get();
+
+        $holidayCount = 0;
+        $workdayCount = 0;
+
+        if ($holidays->count() > 0 ){
+            foreach ($holidays as $holiday){
+                $sDate = Carbon::parse($holiday->begin_date);
+                $eDate = Carbon::parse($holiday->end_date);
+                //Carbon->diffInDays 相差天数+1用于包括当天
+                $holidayCount = $holidayCount + $sDate->diffInDays($eDate) + 1;
+            }
+        }
+
+        if ($workdays->count() > 0 ){
+            foreach ($workdays as $workday){
+                $sDate = Carbon::parse($workday->begin_date);
+                $eDate = Carbon::parse($workday->end_date);
+                $workdayCount = $workdayCount + $sDate->diffInDays($eDate) + 1;
+            }
+        }
+
+        return $holidayCount - $workdayCount ;
+    }
+
+    private function bookOfDays($startDate, $endDate, $method = null)
+    {
+        $user = Auth::user();
+        if (strtolower($method) == 'breakfast') {
+            $days = $user->bookBreakfasts()->where([
+                ['begin_date', '>=', $startDate],
+                ['end_date', '<=', $endDate],
+            ])->get();
+        }
+        if (strtolower($method) == 'lunch') {
+            $days = $user->bookLunches()->where([
+                ['begin_date', '>=', $startDate],
+                ['end_date', '<=', $endDate],
+            ])->get();
+        }
+        if ($days($method) == 'dinner') {
+            $days = $user->bookDinners()->where([
+                ['begin_date', '>=', $startDate],
+                ['end_date', '<=', $endDate],
+            ])->get();
+        }
+
+        $dayCount = 0;
+
+        if ($days->count() > 0){
+            foreach ($days as $day){
+                $workday = $this->diffOfDays($day->begin_date, $day->end_date);
+                $holiday = $this->diffOfHolidays($day->begin_date, $day->end_date);
+                //实际天数=工作日天数减去假期天数
+                $dayCount = $dayCount + ($workday - $holiday);
+            }
+        }
+
+        return $dayCount;
+
+    }
+
+    private function cancelOfDays($startDate, $endDate, $method = null)
+    {
+        $user = Auth::user();
+        if (strtolower($method) == 'breakfast') {
+            $days = $user->cancelBreakfasts()->where([
+                ['begin_date', '>=', $startDate],
+                ['end_date', '<=', $endDate],
+            ])->get();
+        }
+        if (strtolower($method) == 'lunch') {
+            $days = $user->cancelLunches()->where([
+                ['begin_date', '>=', $startDate],
+                ['end_date', '<=', $endDate],
+            ])->get();
+        }
+        if ($days($method) == 'dinner') {
+            $days = $user->cancelDinners()->where([
+                ['begin_date', '>=', $startDate],
+                ['end_date', '<=', $endDate],
+            ])->get();
+        }
+
+        $dayCount = 0;
+
+        if ($days->count() > 0){
+            foreach ($days as $day){
+                $workday = $this->diffOfDays($day->begin_date, $day->end_date);
+                $holiday = $this->diffOfHolidays($day->begin_date, $day->end_date);
+                //实际天数=工作日天数减去假期天数
+                $dayCount = $dayCount + ($workday - $holiday);
+            }
+        }
+
+        return $dayCount;
+
     }
 }

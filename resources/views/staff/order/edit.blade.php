@@ -59,7 +59,12 @@
                             </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="breakfast_begin_date" id="breakfast_begin_date" required value="{{ \Carbon\Carbon::today() }}" >
+                                <input type="datetime" class="form-control" name="breakfast_begin_date" id="breakfast_begin_date" required
+                                       value="{{ \Carbon\Carbon::today()->toDateString() }}"
+                                       onclick="WdatePicker({
+                                           dateFmt:'yyyy-MM-dd',
+                                           minDate:'%y-%M-%d'
+                                           })">
                             </div>
                         </div>
 
@@ -74,7 +79,12 @@
                             </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="lunch_begin_date" id="lunch_begin_date" required value="{{ \Carbon\Carbon::today() }}" >
+                                <input type="datetime" class="form-control" name="lunch_begin_date" id="lunch_begin_date" required
+                                       value="{{ \Carbon\Carbon::today()->toDateString() }}"
+                                       onclick="WdatePicker({
+                                           dateFmt:'yyyy-MM-dd',
+                                           minDate:'%y-%M-%d'
+                                           })">
                             </div>
                         </div>
 
@@ -89,7 +99,12 @@
                             </div>
                             <label class="control-label col-md-2">开始日期：</label>
                             <div class="col-md-3">
-                                <input type="datetime" class="form-control" name="dinner_begin_date" id="dinner_begin_date" required value="{{ \Carbon\Carbon::today() }}" >
+                                <input type="datetime" class="form-control" name="dinner_begin_date" id="dinner_begin_date" required
+                                       value="{{ \Carbon\Carbon::today()->toDateString() }}"
+                                       onclick="WdatePicker({
+                                           dateFmt:'yyyy-MM-dd',
+                                           minDate:'%y-%M-%d'
+                                           })">
                             </div>
                         </div>
 
@@ -171,6 +186,7 @@
 
 @section('script')
     <script src="{{ asset('bootstrap-switch\js\bootstrap-switch.min.js') }}"></script>
+    <script src="{{asset('My97DatePicker/WdatePicker.js')}}"></script>
     <script>
         $('#breakfast_switch, #lunch_switch, #dinner_switch').bootstrapSwitch({
             onText: "开",

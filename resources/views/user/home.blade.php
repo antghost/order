@@ -30,14 +30,12 @@
 
                     <div class="col-md-12">
                         <label>月份：</label>
-                        <select>
-                            <option>2017-08</option>
-                        </select>
+                        <input type="text" name="selectMonth" onclick="WdatePicker({dateFmt:'yyyy-MM'})">
                     </div>
 
                     <div class="col-md-12">
                         <h4>天数</h4>
-                        <div class="col-md-4 text-center"><h2>3</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $workday or '' }}</h2></div>
                         <div class="col-md-4 text-center"><h2>4</h2></div>
                         <div class="col-md-4 text-center"><h2>8</h2></div>
                         <div class="col-md-4 text-center"><label>早餐</label></div>
@@ -60,4 +58,8 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+    <script src="{{asset('My97DatePicker/WdatePicker.js')}}"></script>
 @endsection
