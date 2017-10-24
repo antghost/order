@@ -26,7 +26,7 @@ class HomeController extends Controller
         $startDate = Carbon::today()->startOfMonth()->toDateString();
         $endDate = Carbon::today()->toDateString();
 
-        $weekdays = $this->diffOfDays($startDate, $endDate );
+        $weekdays = $this->diffOfWorkdays($startDate, $endDate);
         $holidays = $this->diffOfHolidays($startDate, $endDate);
         $workday = $weekdays - $holidays;
 
@@ -43,7 +43,7 @@ class HomeController extends Controller
      * @param bool $isWorkday  true:工作日 ,false:周末
      * @return int
      */
-    private function diffOfDays($startDate, $endDay, $isWorkday = true)
+    private function diffOfWorkdays($startDate, $endDay, $isWorkday = true)
     {
         $startDate = Carbon::parse($startDate);
         $endDay = Carbon::parse($endDay);
@@ -86,8 +86,8 @@ class HomeController extends Controller
             foreach ($holidays as $holiday){
                 $sDate = Carbon::parse($holiday->begin_date);
                 $eDate = Carbon::parse($holiday->end_date);
-                //Carbon->diffInDays 相差天数+1用于包括当天
-                $holidayCount = $holidayCount + $sDate->diffInDays($eDate) + 1;
+                //统计假期中的工作日天数
+                $holidayCount = $holidayCount + $this->diffOfWorkdays($sDate, $eDate);
             }
         }
 
@@ -95,7 +95,8 @@ class HomeController extends Controller
             foreach ($workdays as $workday){
                 $sDate = Carbon::parse($workday->begin_date);
                 $eDate = Carbon::parse($workday->end_date);
-                $workdayCount = $workdayCount + $sDate->diffInDays($eDate) + 1;
+                //统计补班中的周末天数
+                $workdayCount = $workdayCount + $this->diffOfWorkdays($sDate, $eDate, false);
             }
         }
 
@@ -128,7 +129,7 @@ class HomeController extends Controller
 
         if ($days->count() > 0){
             foreach ($days as $day){
-                $workday = $this->diffOfDays($day->begin_date, $day->end_date);
+                $workday = $this->diffOfWorkdays($day->begin_date, $day->end_date);
                 $holiday = $this->diffOfHolidays($day->begin_date, $day->end_date);
                 //实际天数=工作日天数减去假期天数
                 $dayCount = $dayCount + ($workday - $holiday);
@@ -165,7 +166,7 @@ class HomeController extends Controller
 
         if ($days->count() > 0){
             foreach ($days as $day){
-                $workday = $this->diffOfDays($day->begin_date, $day->end_date);
+                $workday = $this->diffOfWorkdays($day->begin_date, $day->end_date);
                 $holiday = $this->diffOfHolidays($day->begin_date, $day->end_date);
                 //实际天数=工作日天数减去假期天数
                 $dayCount = $dayCount + ($workday - $holiday);
