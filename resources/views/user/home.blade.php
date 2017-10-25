@@ -35,7 +35,7 @@
 
                     <div class="col-md-12">
                         <h4>天数</h4>
-                        <div class="col-md-4 text-center"><h2>{{ $workday or '' }}</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $breakfastDays or '' }}</h2></div>
                         <div class="col-md-4 text-center"><h2>4</h2></div>
                         <div class="col-md-4 text-center"><h2>8</h2></div>
                         <div class="col-md-4 text-center"><label>早餐</label></div>
@@ -45,7 +45,7 @@
 
                     <div class="col-md-12">
                         <h4>费用</h4>
-                        <div class="col-md-4 text-center"><h2>110.00</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $breakfastAmount or '' }}</h2></div>
                         <div class="col-md-4 text-center"><h2>285.00</h2></div>
                         <div class="col-md-4 text-center"><h2>60.00</h2></div>
                         <div class="col-md-4 text-center"><label>早餐</label></div>

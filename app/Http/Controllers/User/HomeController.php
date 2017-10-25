@@ -26,13 +26,30 @@ class HomeController extends Controller
         $startDate = Carbon::today()->startOfMonth()->toDateString();
         $endDate = Carbon::today()->toDateString();
 
+        //工作日天数
         $weekdays = $this->diffOfWorkdays($startDate, $endDate);
+        //假期或补班天数
         $holidays = $this->diffOfHolidays($startDate, $endDate);
+        //实际工作天数
         $workday = $weekdays - $holidays;
 
         $user = Auth::user();
+
+        //早餐用餐天数
+        if ($user->userOrderStatuses->breakfast){
+            $cancelDays = $this->cancelOfDays($startDate, $endDate, 'breakfast');
+            $breakfastDays = $workday - $cancelDays;
+        } else {
+            $bookDays = $this->bookOfDays($startDate, $endDate, 'breakfast');
+            $breakfastDays = $bookDays;
+        }
+
+        //早餐用餐总额
+        $breakfastAmount = $breakfastDays * $user->price->breakfast;
+
         return view('user.home', [
-            'workday' => $workday,
+            'breakfastDays' => $breakfastDays,
+            'breakfastAmount' => sprintf("%01.2f", $breakfastAmount),
         ]);
     }
 
@@ -118,7 +135,7 @@ class HomeController extends Controller
                 ['end_date', '<=', $endDate],
             ])->get();
         }
-        if ($days($method) == 'dinner') {
+        if (strtolower($method) == 'dinner') {
             $days = $user->bookDinners()->where([
                 ['begin_date', '>=', $startDate],
                 ['end_date', '<=', $endDate],
@@ -155,7 +172,7 @@ class HomeController extends Controller
                 ['end_date', '<=', $endDate],
             ])->get();
         }
-        if ($days($method) == 'dinner') {
+        if (strtolower($method) == 'dinner') {
             $days = $user->cancelDinners()->where([
                 ['begin_date', '>=', $startDate],
                 ['end_date', '<=', $endDate],
