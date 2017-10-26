@@ -13,7 +13,7 @@ class PriceUser extends Model
 
     protected $fillable = ['begin_date', 'valid_date', 'user_id', 'price_id', 'breakfast' , 'lunch' , 'dinner'];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'begin_date', 'valid_date'];
 
     public function user()
     {

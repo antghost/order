@@ -36,8 +36,8 @@
                     <div class="col-md-12">
                         <h4>天数</h4>
                         <div class="col-md-4 text-center"><h2>{{ $breakfastDays or '' }}</h2></div>
-                        <div class="col-md-4 text-center"><h2>4</h2></div>
-                        <div class="col-md-4 text-center"><h2>8</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $lunchDays or '' }}</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $dinnerDays or '' }}</h2></div>
                         <div class="col-md-4 text-center"><label>早餐</label></div>
                         <div class="col-md-4 text-center"><label>午餐</label></div>
                         <div class="col-md-4 text-center"><label>晚餐</label></div>
@@ -46,12 +46,12 @@
                     <div class="col-md-12">
                         <h4>费用</h4>
                         <div class="col-md-4 text-center"><h2>{{ $breakfastAmount or '' }}</h2></div>
-                        <div class="col-md-4 text-center"><h2>285.00</h2></div>
-                        <div class="col-md-4 text-center"><h2>60.00</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $lunchAmount or '' }}</h2></div>
+                        <div class="col-md-4 text-center"><h2>{{ $dinnerAmount or '' }}</h2></div>
                         <div class="col-md-4 text-center"><label>早餐</label></div>
                         <div class="col-md-4 text-center"><label>午餐</label></div>
                         <div class="col-md-4 text-center"><label>晚餐</label></div>
-                        <label>费用合计：</label>385.00 元
+                        <label>费用合计：</label>{{ $totalAmount or '' }} 元
                     </div>
                 </div>
             </div>

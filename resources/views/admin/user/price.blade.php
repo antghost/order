@@ -101,8 +101,8 @@
                                 <tbody>
                                 @foreach( $priceUsers as $priceUser)
                                     <tr>
-                                        <td>{{ $priceUser->begin_date or '' }}</td>
-                                        <td>{{ $priceUser->valid_date or '长期' }}</td>
+                                        <td>{{ $priceUser->begin_date->toDateString() }}</td>
+                                        <td>{{ is_null($priceUser->valid_date) ? '长期' : $priceUser->valid_date->toDateString() }}</td>
                                         <td>早餐：{{$priceUser->breakfast or ''}} 午餐：{{$priceUser->lunch or ''}} 晚餐：{{$priceUser->dinner or ''}}</td>
                                         <td>
                                             {{ is_null($priceUser->valid_date) ? '生效' : '失效' }}

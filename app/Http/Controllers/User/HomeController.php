@@ -33,25 +33,51 @@ class HomeController extends Controller
         //实际工作天数
         $workday = $weekdays - $holidays;
 
-        print('$workday:'.$workday);
         $user = Auth::user();
 
         //早餐用餐天数
         if ($user->userOrderStatuses->breakfast){
             $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast', 'cancel');
-            print('$cancelDays:'.$cancelDays);
             $breakfastDays = $workday - $cancelDays;
         } else {
             $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast', 'book');
             $breakfastDays = $bookDays;
         }
-
         //早餐用餐总额
         $breakfastAmount = $breakfastDays * $user->price->breakfast;
+
+        //午餐用餐天数
+        if ($user->userOrderStatuses->lunch){
+            $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch', 'cancel');
+            $lunchDays = $workday - $cancelDays;
+        } else {
+            $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch', 'book');
+            $lunchDays = $bookDays;
+        }
+        //午餐用餐总额
+        $lunchAmount = $lunchDays * $user->price->lunch;
+
+        //晚餐用餐天数
+        if ($user->userOrderStatuses->dinner){
+            $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner', 'cancel');
+            $dinnerDays = $workday - $cancelDays;
+        } else {
+            $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner', 'book');
+            $dinnerDays = $bookDays;
+        }
+        //晚餐用餐总额
+        $dinnerAmount = $dinnerDays * $user->price->breakfast;
+
+        $totalAmount = $breakfastAmount + $lunchAmount + $dinnerAmount;
 
         return view('user.home', [
             'breakfastDays' => $breakfastDays,
             'breakfastAmount' => sprintf("%01.2f", $breakfastAmount),
+            'lunchDays' => $lunchDays,
+            'lunchAmount' => sprintf("%01.2f", $lunchAmount),
+            'dinnerDays' => $dinnerDays,
+            'dinnerAmount' => sprintf("%01.2f", $dinnerAmount),
+            'totalAmount' => sprintf("%01.2f", $totalAmount),
         ]);
     }
 
@@ -174,7 +200,7 @@ class HomeController extends Controller
                 $dayCount = $dayCount + ($workday - $holiday);
             }
         }
-        var_dump('$dayCount:'.$dayCount);
+//        var_dump('$dayCount:'.$dayCount);
 
         //情况2：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为9月或之前，结束日期为10月或之后(理论上应该只有1条这样的数据)
         $twoRecord = $twoUser->where([
@@ -191,7 +217,7 @@ class HomeController extends Controller
             $holiday = $this->diffOfHolidays($startDate, $twoEndDate);
             //实际天数=工作日天数减去假期天数
             $dayCount = $dayCount + ($workday - $holiday);
-            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
+//            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
 
         }
 
@@ -210,7 +236,7 @@ class HomeController extends Controller
             $holiday = $this->diffOfHolidays($threeRecord->begin_date, $endDate);
             //实际天数=工作日天数减去假期天数
             $dayCount = $dayCount + ($workday - $holiday);
-            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
+//            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
 
         }
 
