@@ -172,7 +172,7 @@ class BreakfastController extends Controller
                 });
         }
 
-        $breakfasts = $breakfasts->where('user_id', $userId)->paginate(15);
+        $breakfasts = $breakfasts->where('user_id', $userId)->orderBy('begin_date')->paginate(15);
 
         //分页参数
         $breakfasts = $breakfasts->appends([

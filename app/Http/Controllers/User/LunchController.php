@@ -200,7 +200,7 @@ class LunchController extends Controller
                 });
         }
 
-        $lunches = $lunches->where('user_id', $userId)->paginate(15);
+        $lunches = $lunches->where('user_id', $userId)->orderBy('begin_date')->paginate(15);
 
         //分页参数
         $lunches = $lunches->appends([

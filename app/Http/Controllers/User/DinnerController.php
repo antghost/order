@@ -201,7 +201,7 @@ class DinnerController extends Controller
                 });
         }
 
-        $dinners = $dinners->where('user_id', $userId)->paginate(15);
+        $dinners = $dinners->where('user_id', $userId)->orderBy('begin_date')->paginate(15);
 
         //分页参数
         $dinners = $dinners->appends([

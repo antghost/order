@@ -33,14 +33,16 @@ class HomeController extends Controller
         //实际工作天数
         $workday = $weekdays - $holidays;
 
+        print('$workday:'.$workday);
         $user = Auth::user();
 
         //早餐用餐天数
         if ($user->userOrderStatuses->breakfast){
-            $cancelDays = $this->cancelOfDays($startDate, $endDate, 'breakfast');
+            $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast', 'cancel');
+            print('$cancelDays:'.$cancelDays);
             $breakfastDays = $workday - $cancelDays;
         } else {
-            $bookDays = $this->bookOfDays($startDate, $endDate, 'breakfast');
+            $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast', 'book');
             $breakfastDays = $bookDays;
         }
 
@@ -120,74 +122,96 @@ class HomeController extends Controller
         return $holidayCount - $workdayCount ;
     }
 
-    private function bookOfDays($startDate, $endDate, $method = null)
+    private function bookOrCancelDays($startDate, $endDate, $method = null, $type = 'book')
     {
-        $user = Auth::user();
-        if (strtolower($method) == 'breakfast') {
-            $days = $user->bookBreakfasts()->where([
-                ['begin_date', '>=', $startDate],
-                ['end_date', '<=', $endDate],
-            ])->get();
+        if ($type == 'book'){
+            if (strtolower($method) == 'breakfast') {
+                $user = Auth::user()->bookBreakfasts();
+                $twoUser = Auth::user()->bookBreakfasts();
+                $threeUser = Auth::user()->bookBreakfasts();
+            }
+            if (strtolower($method) == 'lunch') {
+                $user = Auth::user()->bookLunches();
+                $twoUser = Auth::user()->bookLunches();
+                $threeUser = Auth::user()->bookLunches();
+            }
+            if (strtolower($method) == 'dinner') {
+                $user = Auth::user()->bookDinners();
+                $twoUser = Auth::user()->bookDinners();
+                $threeUser = Auth::user()->bookDinners();
+            }
         }
-        if (strtolower($method) == 'lunch') {
-            $days = $user->bookLunches()->where([
-                ['begin_date', '>=', $startDate],
-                ['end_date', '<=', $endDate],
-            ])->get();
-        }
-        if (strtolower($method) == 'dinner') {
-            $days = $user->bookDinners()->where([
-                ['begin_date', '>=', $startDate],
-                ['end_date', '<=', $endDate],
-            ])->get();
+        if ($type == 'cancel') {
+            if (strtolower($method) == 'breakfast') {
+                $user = Auth::user()->cancelBreakfasts();
+                $twoUser = Auth::user()->cancelBreakfasts();
+                $threeUser = Auth::user()->cancelBreakfasts();
+            }
+            if (strtolower($method) == 'lunch') {
+                $user = Auth::user()->cancelLunches();
+                $twoUser = Auth::user()->cancelLunches();
+                $threeUser = Auth::user()->cancelLunches();
+            }
+            if (strtolower($method) == 'dinner') {
+                $user = Auth::user()->cancelDinners();
+                $twoUser = Auth::user()->cancelDinners();
+                $threeUser = Auth::user()->cancelDinners();
+            }
         }
 
         $dayCount = 0;
+        //情况1：$startDate：10月1日，$endDate：10月31日，数据记录开始与结束日期都为10月
+        $oneRecords = $user->where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+        ])->get();
 
-        if ($days->count() > 0){
-            foreach ($days as $day){
-                $workday = $this->diffOfWorkdays($day->begin_date, $day->end_date);
-                $holiday = $this->diffOfHolidays($day->begin_date, $day->end_date);
+        if ($oneRecords->count() > 0){
+            foreach ($oneRecords as $oneRecord){
+                $workday = $this->diffOfWorkdays($oneRecord->begin_date, $oneRecord->end_date);
+                $holiday = $this->diffOfHolidays($oneRecord->begin_date, $oneRecord->end_date);
                 //实际天数=工作日天数减去假期天数
                 $dayCount = $dayCount + ($workday - $holiday);
             }
         }
+        var_dump('$dayCount:'.$dayCount);
 
-        return $dayCount;
+        //情况2：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为9月或之前，结束日期为10月或之后(理论上应该只有1条这样的数据)
+        $twoRecord = $twoUser->where([
+            ['begin_date', '<=', $startDate],
+            ['end_date', '>=', $startDate],
+        ])->first();
 
-    }
+        //dd($twoRecord);
 
-    private function cancelOfDays($startDate, $endDate, $method = null)
-    {
-        $user = Auth::user();
-        if (strtolower($method) == 'breakfast') {
-            $days = $user->cancelBreakfasts()->where([
-                ['begin_date', '>=', $startDate],
-                ['end_date', '<=', $endDate],
-            ])->get();
-        }
-        if (strtolower($method) == 'lunch') {
-            $days = $user->cancelLunches()->where([
-                ['begin_date', '>=', $startDate],
-                ['end_date', '<=', $endDate],
-            ])->get();
-        }
-        if (strtolower($method) == 'dinner') {
-            $days = $user->cancelDinners()->where([
-                ['begin_date', '>=', $startDate],
-                ['end_date', '<=', $endDate],
-            ])->get();
+        if (isset($twoRecord)){
+            //开始日期为$startDate，结束日期为$twoRecord->end_date
+            ($twoRecord->end_date >= $endDate) ? $twoEndDate = $endDate : $twoEndDate = $twoRecord->end_date;
+            $workday = $this->diffOfWorkdays($startDate, $twoEndDate);
+            $holiday = $this->diffOfHolidays($startDate, $twoEndDate);
+            //实际天数=工作日天数减去假期天数
+            $dayCount = $dayCount + ($workday - $holiday);
+            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
+
         }
 
-        $dayCount = 0;
+        //情况3：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为10月，结束日期为11月或之后(理论上应该只有1条这样的数据)
+        $threeRecord = $threeUser->where([
+            ['begin_date', '<=', $endDate],
+            ['begin_date', '>=', $startDate],
+            ['end_date', '>=', $endDate],
+        ])->first();
 
-        if ($days->count() > 0){
-            foreach ($days as $day){
-                $workday = $this->diffOfWorkdays($day->begin_date, $day->end_date);
-                $holiday = $this->diffOfHolidays($day->begin_date, $day->end_date);
-                //实际天数=工作日天数减去假期天数
-                $dayCount = $dayCount + ($workday - $holiday);
-            }
+        //dd($threeRecord);
+
+        if (isset($threeRecord)){
+            //开始日期为$threeRecord->begin_date，结束日期为$endDate
+            $workday = $this->diffOfWorkdays($threeRecord->begin_date, $endDate);
+            $holiday = $this->diffOfHolidays($threeRecord->begin_date, $endDate);
+            //实际天数=工作日天数减去假期天数
+            $dayCount = $dayCount + ($workday - $holiday);
+            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
+
         }
 
         return $dayCount;
