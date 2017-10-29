@@ -35,12 +35,12 @@
 
                         <div class="col-md-12">
                             <div class="alert alert-info" style="margin-top: 10px">
-                                <p>早餐需提前一天设置。（长期开餐或停餐请联系餐厅负责部门设置）</p>
+                                <p>早餐：当天开餐须在{{ $orderTime->book_time or '' }}前，当天停餐须在{{ $orderTime->cancel_time or '' }}前。</p>
                             </div>
                             <form action="{{ url('user/breakfast') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="book">
-                                <span>开餐设置</span>
+                                <input type="hidden" name="status" value="{{ $status or '' }}">
                                 <table class="table">
                                     <thead>
                                     <tr>
@@ -50,15 +50,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if (Auth::user()->userOrderStatuses->breakfast)
-                                        <tr>
-                                            <td>{{ $bookBreakfast->begin_date or '' }}</td>
-                                            <td>{{ $bookBreakfast->end_date or '长期' }}</td>
-                                            <td>
-                                                <p>长期开餐或停餐请联系餐厅负责部门设置</p>
-                                            </td>
-                                        </tr>
-                                    @else
+
                                         <tr>
                                             <td>
                                                 <input type="hidden" name="id" value="{{ $bookBreakfast->id or '' }}">
@@ -89,7 +81,7 @@
                                                 <button type="submit" class="btn btn-info">保存</button>
                                             </td>
                                         </tr>
-                                    @endif
+
                                     </tbody>
                                 </table>
                             </form>
@@ -99,6 +91,7 @@
                             <form action="{{ url('user/breakfast') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="cancel">
+                                <input type="hidden" name="status" value="{{ $status or '' }}">
                                 <span>停餐设置</span>
                                 <table class="table">
                                     <thead>

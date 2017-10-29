@@ -31,37 +31,47 @@ class BreakfastController extends Controller
     public function create()
     {
         //已验证用户id
-        $id = Auth::user()->id;
-        $userOrderStatus = Auth::user()->userOrderStatuses;
-        //停开餐状态判断
-        if ($userOrderStatus->breakfast){
-            //开餐状态，开餐结束日期为空；停餐结束日期为有效记录
-            $bookBreakfast = BookBreakfast::whereNull('end_date')->where('user_id',$id)->first();
-            $cancelBreakfast = CancelBreakfast::where([['user_id', '=', $id],['end_date', '>', date('Y-m-d')]])->first();
-            //当开始日期为昨天或之前时限制为只读
-            if (isset($cancelBreakfast)) {
-                $beginDate = Carbon::parse($cancelBreakfast->begin_date);
-                $beginDate->lte(Carbon::today()) ? $readonly = true : $readonly = false;
-            } else {
-                $readonly = false;
-            }
+        $user = Auth::user();
+        $orderTime = DB::table('order_times')->where('type', 1)->first(); //停开餐时限
+
+        $today = Carbon::today();
+        //用于日历控件中的最小日期值，超过时限只能选择明天
+        date('H:i:s') > $orderTime->book_time ? $bookMinDate = $today->addDay()->toDateString()
+            : $bookMinDate = $today->toDateString();
+        date('H:i:s') > $orderTime->cancel_time ? $cancelMinDate = $today->addDay()->toDateString()
+            : $cancelMinDate = $today->toDateString();
+        //有效记录
+        $bookOne = $user->bookBreakfasts()->whereNull('end_date')->first();
+        $bookSecond = $user->bookBreakfasts()->whereNotNull('end_date')
+            ->where('end_date', '>=', $today->toDateString())->first();
+
+        //当开始日期为昨天或之前时限制为只读
+        if (isset($bookOne)){
+            $statusOne = 'update';
         } else {
-            //停餐状态，开餐结束日期为空；开餐结束日期为有效记录
-            $bookBreakfast = BookBreakfast::where([['user_id', $id],['end_date', '>', date('Y-m-d')]])->first();
-            $cancelBreakfast = CancelBreakfast::whereNull('end_date')->where('user_id',$id)->first();
-            //当开始日期为昨天或之前时限制为只读
-            if (isset($bookBreakfast)) {
-                $beginDate = Carbon::parse($bookBreakfast->begin_date);
-                $beginDate->lte(Carbon::today()) ? $readonly = true : $readonly = false;
-            } else {
-                $readonly = false;
-            }
+            $statusOne = 'create';
+        }
+
+        if (isset($bookSecond)) {
+            $endDate = Carbon::parse($bookSecond->end_date);
+            ($endDate->lt(Carbon::today())
+                || ($endDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
+                ? $readonly = true : $readonly = false;
+            $statusSecond = 'update';
+        } else {
+            $readonly = false;
+            $statusSecond = 'create';
         }
 
         return view('user.breakfast.create',[
-            'bookBreakfast' => $bookBreakfast,
-            'cancelBreakfast' => $cancelBreakfast,
+            'bookOne' => $bookOne,
+            'bookSecond' => $bookSecond,
+            'orderTime' => $orderTime,
+            'bookMinDate' => $bookMinDate,
+            'cancelMinDate' => $cancelMinDate,
             'readonly' => $readonly,
+            'statusOne' => $statusOne,
+            'statusSecond' => $statusSecond,
         ]);
     }
 

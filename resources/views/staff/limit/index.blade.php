@@ -42,12 +42,12 @@
                                         <td>
                                             <input type="text" name="book_time" required
                                                    value="{{ $breakfastTime->book_time or '' }}"
-                                                   onclick="WdatePicker({dateFmt:'H:mm:ss', minTime:'08:30:00', maxTime:'17:30:00'})">
+                                                   onclick="WdatePicker({dateFmt:'H:mm:ss', minTime:'6:0:00', maxTime:'17:30:00'})">
                                         </td>
                                         <td>
                                             <input type="text" name="cancel_time" required
                                                    value="{{ $breakfastTime->cancel_time or '' }}"
-                                                   onclick="WdatePicker({dateFmt:'H:mm:ss', minTime:'08:30:00', maxTime:'17:30:00'})">
+                                                   onclick="WdatePicker({dateFmt:'H:mm:ss', minTime:'6:0:00', maxTime:'17:30:00'})">
                                         </td>
                                         <td>
                                             <button type="submit" class="btn btn-info">保存</button>

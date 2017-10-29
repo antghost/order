@@ -27,36 +27,20 @@ class HomeController extends Controller
         $startDate = Carbon::today()->startOfMonth()->toDateString();
         $endDate = Carbon::today()->toDateString();
 
-        //工作日天数
-        $weekdays = $this->diffOfWorkdays($startDate, $endDate);
-        //假期或补班天数
-        $holidays = $this->diffOfHolidays($startDate, $endDate);
-        //实际工作天数
-        $workday = $weekdays - $holidays;
-
         $user = Auth::user();
 
         //早餐用餐天数
-        $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast', 'cancel');
-        $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast', 'book');
-        $breakfastDays = $workday - $cancelDays + $bookDays;
-
+        $breakfastDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast');
         //早餐用餐总额
         $breakfastAmount = $breakfastDays * $user->price->breakfast;
 
         //午餐用餐天数
-        $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch', 'cancel');
-        $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch', 'book');
-        $lunchDays = $workday - $cancelDays + $bookDays;
-
+        $lunchDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch');
         //午餐用餐总额
         $lunchAmount = $lunchDays * $user->price->lunch;
 
         //晚餐用餐天数
-        $cancelDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner', 'cancel');
-        $bookDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner', 'book');
-        $dinnerDays = $workday - $cancelDays + $bookDays;
-
+        $dinnerDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner');
         //晚餐用餐总额
         $dinnerAmount = $dinnerDays * $user->price->breakfast;
 
@@ -142,7 +126,7 @@ class HomeController extends Controller
 
     private function bookOrCancelDays($startDate, $endDate, $method = null, $type = 'book')
     {
-        if ($type == 'book'){
+        if (strtolower($type) == 'book'){
             if (strtolower($method) == 'breakfast') {
                 $user = Auth::user()->bookBreakfasts();
                 $twoUser = Auth::user()->bookBreakfasts();
@@ -159,7 +143,7 @@ class HomeController extends Controller
                 $threeUser = Auth::user()->bookDinners();
             }
         }
-        if ($type == 'cancel') {
+        if (strtolower($type) == 'cancel') {
             if (strtolower($method) == 'breakfast') {
                 $user = Auth::user()->cancelBreakfasts();
                 $twoUser = Auth::user()->cancelBreakfasts();
