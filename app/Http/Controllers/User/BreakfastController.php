@@ -40,31 +40,41 @@ class BreakfastController extends Controller
             : $bookMinDate = $today->toDateString();
         date('H:i:s') > $orderTime->cancel_time ? $cancelMinDate = $today->addDay()->toDateString()
             : $cancelMinDate = $today->toDateString();
+
         //有效记录
-        $bookOne = $user->bookBreakfasts()->whereNull('end_date')->first();
-        $bookSecond = $user->bookBreakfasts()->whereNotNull('end_date')
-            ->where('end_date', '>=', $today->toDateString())->first();
+        $bookFirst = $user->bookBreakfasts()->whereNotNull('end_date')->where('end_date', '>=', $today->toDateString())->first();
+        $bookSecond = $user->bookBreakfasts()->whereNull('end_date')->first();
 
         //当开始日期为昨天或之前时限制为只读
-        if (isset($bookOne)){
+        if (isset($bookFirst)){
+            $cancelBeginDate = Carbon::parse($bookFirst->end_date)->addDay()->toDateString();
+            $bookFirstBeginDate = Carbon::parse($bookFirst->begin_date);
+            $bookFirstEndDate = $bookFirst->end_date;
+            ($bookFirstBeginDate->lt(Carbon::today())
+                || ($bookFirstBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
+                ? $readonly = true : $readonly = false;
             $statusOne = 'update';
         } else {
             $statusOne = 'create';
         }
 
         if (isset($bookSecond)) {
+            $cancelEndDate = Carbon::parse($bookSecond->begin_date)->subDay()->toDateString();
+            $bookSecondBeginDate = $bookSecond->begin_date;
+            $bookSecondEndDate = $bookSecond->end_date;
+
             $endDate = Carbon::parse($bookSecond->end_date);
             ($endDate->lt(Carbon::today())
                 || ($endDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
                 ? $readonly = true : $readonly = false;
             $statusSecond = 'update';
         } else {
-            $readonly = false;
+            $bookSecondReadonly = false;
             $statusSecond = 'create';
         }
-
+        
         return view('user.breakfast.create',[
-            'bookOne' => $bookOne,
+            'bookOne' => $bookFirst,
             'bookSecond' => $bookSecond,
             'orderTime' => $orderTime,
             'bookMinDate' => $bookMinDate,
