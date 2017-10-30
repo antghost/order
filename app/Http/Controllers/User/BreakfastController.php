@@ -47,39 +47,54 @@ class BreakfastController extends Controller
 
         //当开始日期为昨天或之前时限制为只读
         if (isset($bookFirst)){
+            //停餐开始日期
             $cancelBeginDate = Carbon::parse($bookFirst->end_date)->addDay()->toDateString();
             $bookFirstBeginDate = Carbon::parse($bookFirst->begin_date);
             $bookFirstEndDate = $bookFirst->end_date;
             ($bookFirstBeginDate->lt(Carbon::today())
-                || ($bookFirstBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
-                ? $readonly = true : $readonly = false;
+                || ($bookFirstBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
+                ? $bookFirstReadonly = true : $bookFirstReadonly = false;
             $statusOne = 'update';
         } else {
+            $cancelBeginDate = null;
+            $bookFirstReadonly = false;
             $statusOne = 'create';
         }
 
         if (isset($bookSecond)) {
+            //停餐结束日期
             $cancelEndDate = Carbon::parse($bookSecond->begin_date)->subDay()->toDateString();
-            $bookSecondBeginDate = $bookSecond->begin_date;
+            $bookSecondBeginDate = Carbon::parse($bookSecond->begin_date);
             $bookSecondEndDate = $bookSecond->end_date;
-
-            $endDate = Carbon::parse($bookSecond->end_date);
-            ($endDate->lt(Carbon::today())
-                || ($endDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
-                ? $readonly = true : $readonly = false;
+            ($bookSecondBeginDate->lt(Carbon::today())
+                || ($bookSecondBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
+                ? $bookSecondReadonly = true : $bookSecondReadonly = false;
             $statusSecond = 'update';
         } else {
+            $cancelEndDate = null;
             $bookSecondReadonly = false;
             $statusSecond = 'create';
         }
-        
+        //当停餐开始日期$cancelBeginDate为null时
+        if (is_null($cancelBeginDate)) $cancelEndDate = null;
+
+        var_dump($cancelBeginDate, $cancelEndDate);
+
+        (Carbon::parse($cancelBeginDate)->lt(Carbon::today())
+            || (Carbon::parse($cancelBeginDate)->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
+            ? $cancelReadonly = true : $cancelReadonly = false;
+
         return view('user.breakfast.create',[
             'bookOne' => $bookFirst,
             'bookSecond' => $bookSecond,
             'orderTime' => $orderTime,
             'bookMinDate' => $bookMinDate,
             'cancelMinDate' => $cancelMinDate,
-            'readonly' => $readonly,
+            'bookFirstReadonly' => $bookFirstReadonly,
+            'bookSecondReadonly' => $bookSecondReadonly,
+            'cancelBeginDate' => $cancelBeginDate,
+            'cancelEndDate' => $cancelEndDate,
+            'cancelReadonly' => $cancelReadonly,
             'statusOne' => $statusOne,
             'statusSecond' => $statusSecond,
         ]);

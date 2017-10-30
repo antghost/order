@@ -56,7 +56,7 @@
                                             <td>
                                                 <input type="hidden" name="id" value="{{ $bookOne->id or '' }}">
                                                 {{--开始日期--}}
-                                                @if ($readonly)
+                                                @if ($bookOneReadonly)
                                                     <input type="text" id="book_begin_date" name="begin_date" required
                                                            readonly value="{{ $bookOne->begin_date or '' }}" >
                                                 @else
@@ -88,7 +88,7 @@
                                             <td>
                                                 <input type="hidden" name="id" value="{{ $bookSecond->id or '' }}">
                                                 {{--开始日期--}}
-                                                @if ($readonly)
+                                                @if ($bookSecondReadonly)
                                                     <input type="text" id="book_begin_date" name="begin_date" required
                                                            readonly value="{{ $bookSecond->begin_date or '' }}" >
                                                 @else
@@ -96,7 +96,7 @@
                                                            value="{{ $bookSecond->begin_date or '' }}"
                                                            onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
-                                                       minDate:'%y-%M-{%d+1}',
+                                                       minDate:'{{ $bookMinDate }}',
                                                        maxDate:'#F{$dp.$D(\'book_end_date\')}'
                                                        })">
                                                 @endif
@@ -140,15 +140,15 @@
                                             <td>
                                                 <input type="hidden" name="id" value="{{ $cancelBreakfast->id or '' }}">
                                                 {{--开始日期--}}
-                                                @if ($readonly)
+                                                @if ($cancelReadonly)
                                                     <input type="text" id="cancel_begin_date" name="begin_date" required
-                                                           readonly value="{{ $cancelBreakfast->begin_date or '' }}">
+                                                           readonly value="{{ $cancelBeginDate or '' }}">
                                                 @else
                                                     <input type="text" id="cancel_begin_date" name="begin_date" required
-                                                           value="{{ $cancelBreakfast->begin_date or '' }}"
+                                                           value="{{ $cancelBeginDate or '' }}"
                                                            onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
-                                                       minDate:'%y-%M-{%d+1}',
+                                                       minDate:'{{$cancelMinDate}}',
                                                        maxDate:'#F{$dp.$D(\'cancel_end_date\')}'
                                                        })">
                                                 @endif
@@ -156,10 +156,10 @@
                                             <td>
                                                 {{--结束日期--}}
                                                 <input type="text" id="cancel_end_date" name="end_date" required
-                                                       value="{{ $cancelBreakfast->end_date or '' }}"
+                                                       value="{{ $cancelEndDate or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
-                                                       minDate:'#F{\'%y-%M-{%d+1}\' || $dp.$D(\'cancel_begin_date\')}'
+                                                       minDate:'#F{\'{{$cancelMinDate}}\' || $dp.$D(\'cancel_begin_date\')}'
                                                        })">
                                             </td>
                                             <td>
