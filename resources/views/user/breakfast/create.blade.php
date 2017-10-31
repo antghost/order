@@ -37,7 +37,7 @@
                             <div class="alert alert-info" style="margin-top: 10px">
                                 <p>早餐：当天开餐须在{{ $orderTime->book_time or '' }}前，当天停餐须在{{ $orderTime->cancel_time or '' }}前。</p>
                             </div>
-                            <form action="{{ url('user/breakfast') }}" method="post">
+                            <form name="bookForm" action="{{ url('user/breakfast') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="book">
                                 <input type="hidden" name="status" value="{{ $status or '' }}">
@@ -51,17 +51,17 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if(isset($bookOne))
+                                    @if(isset($bookFirst))
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="id" value="{{ $bookOne->id or '' }}">
+                                                <input type="hidden" name="id" value="{{ $bookFirst->id or '' }}">
                                                 {{--开始日期--}}
-                                                @if ($bookOneReadonly)
+                                                @if ($bookFirstReadonly)
                                                     <input type="text" id="book_begin_date" name="begin_date" required
-                                                           readonly value="{{ $bookOne->begin_date or '' }}" >
+                                                           readonly value="{{ $bookFirst->begin_date or '' }}" >
                                                 @else
                                                     <input type="text" id="book_begin_date" name="begin_date" required
-                                                           value="{{ $bookOne->begin_date or '' }}"
+                                                           value="{{ $bookFirst->begin_date or '' }}"
                                                            onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'{{ $bookMinDate }}',
@@ -72,7 +72,7 @@
                                             <td>
                                                 {{--结束日期--}}
                                                 <input type="text" id="book_end_date" name="end_date"
-                                                       value="{{ $bookOne->end_date or '' }}"
+                                                       value="{{ $bookFirst->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
@@ -107,7 +107,7 @@
                                                        value="{{ $bookSecond->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
-                                                       minDate:'#F{\'%y-%M-{%d+1}\' || $dp.$D(\'book_begin_date\')}'
+                                                       minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
                                                        })">
                                             </td>
                                             <td>
@@ -121,10 +121,17 @@
                         </div>
 
                         <div class="col-md-12">
-                            <form action="{{ url('user/breakfast') }}" method="post">
+                            <form name="cancelForm" action="{{ url('user/breakfast') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="cancel">
                                 <input type="hidden" name="status" value="{{ $status or '' }}">
+                                @if (isset($bookFirst))
+                                    <input type="hidden" name="bookFirstId" value="{{ $bookFirst->id }}">
+                                    <input type="hidden" name="bookFirstEndDate" value="{{ $bookFirst->end_date }}">
+                                @endif
+                                @if (isset($bookSecond))
+                                    <input type="hidden" name="bookSecondId" value="{{ $bookSecond->id }}">
+                                @endif
                                 <span>停餐设置</span>
                                 <table class="table">
                                     <thead>
@@ -138,7 +145,6 @@
 
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="id" value="{{ $cancelBreakfast->id or '' }}">
                                                 {{--开始日期--}}
                                                 @if ($cancelReadonly)
                                                     <input type="text" id="cancel_begin_date" name="begin_date" required
@@ -155,7 +161,7 @@
                                             </td>
                                             <td>
                                                 {{--结束日期--}}
-                                                <input type="text" id="cancel_end_date" name="end_date" required
+                                                <input type="text" id="cancel_end_date" name="end_date"
                                                        value="{{ $cancelEndDate or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
