@@ -40,7 +40,6 @@
                             <form name="bookForm" action="{{ url('user/breakfast') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="book">
-                                <input type="hidden" name="status" value="{{ $status or '' }}">
                                 <span>开餐设置</span>
                                 <table class="table">
                                     <thead>
@@ -51,38 +50,78 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if(isset($bookFirst))
+                                    {{--当没有有效开餐记录时生成输入--}}
+                                    @if(!isset($bookFirst) && !isset($bookSecond))
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="id" value="{{ $bookFirst->id or '' }}">
-                                                {{--开始日期--}}
-                                                @if ($bookFirstReadonly)
-                                                    <input type="text" id="book_begin_date" name="begin_date" required
-                                                           readonly value="{{ $bookFirst->begin_date or '' }}" >
-                                                @else
-                                                    <input type="text" id="book_begin_date" name="begin_date" required
-                                                           value="{{ $bookFirst->begin_date or '' }}"
-                                                           onclick="WdatePicker({
-                                                       dateFmt:'yyyy-MM-dd',
-                                                       minDate:'{{ $bookMinDate }}',
-                                                       maxDate:'#F{$dp.$D(\'book_end_date\')}'
-                                                       })">
-                                                @endif
+                                                <input type="text" id="book_begin_date" name="begin_date" required
+                                                       value="{{ $bookFirst->begin_date or '' }}"
+                                                       onclick="WdatePicker({
+                                                               dateFmt:'yyyy-MM-dd',
+                                                               minDate:'{{ $bookMinDate }}',
+                                                               maxDate:'#F{$dp.$D(\'book_end_date\')}'
+                                                               })">
                                             </td>
                                             <td>
-                                                {{--结束日期--}}
                                                 <input type="text" id="book_end_date" name="end_date"
                                                        value="{{ $bookFirst->end_date or '' }}"
                                                        onclick="WdatePicker({
-                                                       dateFmt:'yyyy-MM-dd',
-                                                       minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
-                                                       })">
+                                                               dateFmt:'yyyy-MM-dd',
+                                                               minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
+                                                               })">
                                             </td>
                                             <td>
                                                 <button type="submit" class="btn btn-info">保存</button>
                                             </td>
                                         </tr>
                                     @endif
+                                    {{--开餐记录结束日期不为空且为有效日期处理--}}
+                                    @if(isset($bookFirst))
+                                        <tr>
+                                            @if(isset($bookSecond))
+                                                <td>
+                                                    <input type="hidden" name="id" value="{{ $bookFirst->id or '' }}">
+                                                    <input type="text" id="book_begin_date" name="begin_date" required
+                                                           readonly value="{{ $bookFirst->begin_date or '' }}" >
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="book_begin_date" name="begin_date" required
+                                                           readonly value="{{ $bookFirst->end_date or '' }}" >
+                                                </td>
+                                                <td></td>
+                                            @else
+                                                <td>
+                                                    <input type="hidden" name="id" value="{{ $bookFirst->id or '' }}">
+                                                    {{--开始日期--}}
+                                                    @if ($bookFirstReadonly)
+                                                        <input type="text" id="book_begin_date" name="begin_date" required
+                                                               readonly value="{{ $bookFirst->begin_date or '' }}" >
+                                                    @else
+                                                        <input type="text" id="book_begin_date" name="begin_date" required
+                                                               value="{{ $bookFirst->begin_date or '' }}"
+                                                               onclick="WdatePicker({
+                                                                       dateFmt:'yyyy-MM-dd',
+                                                                       minDate:'{{ $bookMinDate }}',
+                                                                       maxDate:'#F{$dp.$D(\'book_end_date\')}'
+                                                                       })">
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    {{--结束日期--}}
+                                                    <input type="text" id="book_end_date" name="end_date"
+                                                           value="{{ $bookFirst->end_date or '' }}"
+                                                           onclick="WdatePicker({
+                                                                   dateFmt:'yyyy-MM-dd',
+                                                                   minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
+                                                                   })">
+                                                </td>
+                                                <td>
+                                                    <button type="submit" class="btn btn-info">保存</button>
+                                                </td>
+                                            @endif
+                                        </tr>
+                                    @endif
+                                    {{--开餐记录结束日期为空处理--}}
                                     @if(isset($bookSecond))
                                         <tr>
                                             <td>
@@ -103,7 +142,7 @@
                                             </td>
                                             <td>
                                                 {{--结束日期--}}
-                                                <input type="text" id="book_end_date" name="end_date" required
+                                                <input type="text" id="book_end_date" name="end_date"
                                                        value="{{ $bookSecond->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
@@ -124,7 +163,6 @@
                             <form name="cancelForm" action="{{ url('user/breakfast') }}" method="post">
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="cancel">
-                                <input type="hidden" name="status" value="{{ $status or '' }}">
                                 @if (isset($bookFirst))
                                     <input type="hidden" name="bookFirstId" value="{{ $bookFirst->id }}">
                                     <input type="hidden" name="bookFirstEndDate" value="{{ $bookFirst->end_date }}">

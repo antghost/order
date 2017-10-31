@@ -24,37 +24,33 @@
                             </ul>
                         </div>
 
-                            <div class="col-md-12 alert alert-info" style="margin-top: 10px;">
-                                <p>{{ $msg or '' }}</p>
-                            </div>
-
                         <div class="col-md-12">
 
                             <form action="{{ url('user/breakfast/s') }}" class="navbar-form navbar-left" role="search">
                                 <div class="form-group">
                                     <label for="startdate">开始日期</label>
-                                    <input type="text" id="startdate" name="begin_date" class="form-control"
+                                    <input type="text" id="start_date" name="begin_date" class="form-control"
                                            value="{{ \Carbon\Carbon::today()->startOfMonth()->toDateString() }}"
                                            onclick="WdatePicker({
                                            dateFmt:'yyyy-MM-dd',
-                                           maxDate:'#F{$dp.$D(\'enddate\')}' })">
+                                           maxDate:'#F{$dp.$D(\'end_date\')}' })">
                                 </div>
                                 <div class="form-group">
                                     <label for="enddate">结束日期</label>
-                                    <input type="text" id="enddate" name="end_date" class="form-control"
+                                    <input type="text" id="end_date" name="end_date" class="form-control"
                                            value="{{ \Carbon\Carbon::today()->endOfMonth()->toDateString() }}"
                                            onclick="WdatePicker({
                                            dateFmt:'yyyy-MM-dd',
-                                           minDate:'#F{$dp.$D(\'startdate\')}'})">
+                                           minDate:'#F{$dp.$D(\'start_date\')}'})">
                                 </div>
-                                <div class="form-group">
-                                    <input type="checkbox" checked id="book" name="book">
-                                    <label for="book">开餐 </label>
-                                </div>
-                                <div class="form-group">
-                                    <input type="checkbox" checked id="cancel" name="cancel">
-                                    <label for="cancel">停餐 </label>
-                                </div>
+                                {{--<div class="form-group">--}}
+                                    {{--<input type="checkbox" checked id="book" name="book">--}}
+                                    {{--<label for="book">开餐 </label>--}}
+                                {{--</div>--}}
+                                {{--<div class="form-group">--}}
+                                    {{--<input type="checkbox" checked id="cancel" name="cancel">--}}
+                                    {{--<label for="cancel">停餐 </label>--}}
+                                {{--</div>--}}
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-info">查询</button>
                                 </div>
@@ -68,7 +64,7 @@
                                 <tr>
                                     <th>开始日期</th>
                                     <th>结束日期</th>
-                                    <th>类型</th>
+                                    <th>用餐天数</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -77,7 +73,7 @@
                                         <tr>
                                             <td>{{ $breakfast->begin_date or '' }}</td>
                                             <td>{{ $breakfast->end_date or '长期' }}</td>
-                                            <td>{{ $breakfast->type or '' }}</td>
+                                            <td>{{ $breakfast->days or '' }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
@@ -85,7 +81,7 @@
                             </table>
                             @if (isset($breakfasts))
                                 {{ $breakfasts->links() }}
-                                @endif
+                            @endif
                         </div>
                     </div>
                 </div>
