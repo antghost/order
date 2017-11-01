@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use function foo\func;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -38,16 +39,16 @@ class BreakfastController extends Controller
         date('H:i:s') > $orderTime->cancel_time ? $cancelMinDate = $today->copy()->addDay()->toDateString()
             : $cancelMinDate = $today->toDateString();
 
-        //有效记录
+        //前段有效记录
         $bookFirst = $user->bookBreakfasts()->whereNotNull('end_date')->where('end_date', '>=', $today->toDateString())->first();
+        //后段有效记录
         $bookSecond = $user->bookBreakfasts()->whereNull('end_date')->first();
 
         //当开始日期为昨天或之前时限制为只读
         if (isset($bookFirst)){
             //停餐开始日期
-            $cancelBeginDate = Carbon::parse($bookFirst->end_date)->copy()->addDay()->toDateString();
+            $cancelBeginDate = Carbon::parse($bookFirst->end_date)->copy()->addDay();
             $bookFirstBeginDate = Carbon::parse($bookFirst->begin_date);
-            $bookFirstEndDate = $bookFirst->end_date;
             ($bookFirstBeginDate->lt(Carbon::today())
                 || ($bookFirstBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
                 ? $bookFirstReadonly = true : $bookFirstReadonly = false;
@@ -58,18 +59,25 @@ class BreakfastController extends Controller
 
         if (isset($bookSecond)) {
             //停餐结束日期
-            $cancelEndDate = Carbon::parse($bookSecond->begin_date)->subDay()->toDateString();
+            $cancelEndDate = Carbon::parse($bookSecond->begin_date)->subDay();
             $bookSecondBeginDate = Carbon::parse($bookSecond->begin_date);
-            $bookSecondEndDate = $bookSecond->end_date;
             ($bookSecondBeginDate->lt(Carbon::today())
                 || ($bookSecondBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
                 ? $bookSecondReadonly = true : $bookSecondReadonly = false;
+            //如果前段有效记录存在，开餐最小日期为前期记录结束日期+1
+            if (isset($bookFirst)) $bookMinDate = $cancelBeginDate->toDateString();
         } else {
             $cancelEndDate = null;
             $bookSecondReadonly = false;
         }
         //当停餐开始日期$cancelBeginDate为null时
         if (is_null($cancelBeginDate)) $cancelEndDate = null;
+        if (!is_null($cancelBeginDate) && !is_null($cancelEndDate) && $cancelBeginDate->gt($cancelEndDate)) {
+            $cancelBeginDate = null;
+            $cancelEndDate = null;
+        }
+        if (!is_null($cancelBeginDate)) $cancelBeginDate = $cancelBeginDate->toDateString();
+        if (!is_null($cancelEndDate)) $cancelEndDate = $cancelEndDate->toDateString();
 
         (Carbon::parse($cancelBeginDate)->lt(Carbon::today())
             || (Carbon::parse($cancelBeginDate)->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
@@ -236,6 +244,10 @@ class BreakfastController extends Controller
                 $query->where('end_date','<=', $endDate);
             });
 
+        $breakfasts = $breakfasts->each(function ($tem){
+            return $tem;
+        })->put('days', 10);
+        dd($breakfasts);
         $breakfasts = $breakfasts->orderBy('begin_date')->paginate(15);
 
         //分页参数
@@ -243,6 +255,8 @@ class BreakfastController extends Controller
             'begin_date' => $beginDate,
             'end_date' => $endDate,
         ]);
+
+
 
         return view('user.breakfast.index', ['breakfasts' => $breakfasts]);
     }
