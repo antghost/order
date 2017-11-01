@@ -32,6 +32,45 @@ class HomeController extends Controller
         //早餐用餐天数
         $breakfastDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast');
         //早餐用餐总额
+        $breakfastAmount = bcmul($breakfastDays , $user->price->breakfast, 2);
+
+        //午餐用餐天数
+        $lunchDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch');
+        //午餐用餐总额
+        $lunchAmount = $lunchDays * $user->price->lunch;
+
+        //晚餐用餐天数
+        $dinnerDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner');
+        //晚餐用餐总额
+        $dinnerAmount = $dinnerDays * $user->price->breakfast;
+
+        $totalAmount = $breakfastAmount + $lunchAmount + $dinnerAmount;
+
+        return view('user.home', [
+            'breakfastDays' => $breakfastDays,
+            'breakfastAmount' => $breakfastAmount,//sprintf("%01.2f", $breakfastAmount),
+            'lunchDays' => $lunchDays,
+            'lunchAmount' => sprintf("%01.2f", $lunchAmount),
+            'dinnerDays' => $dinnerDays,
+            'dinnerAmount' => sprintf("%01.2f", $dinnerAmount),
+            'totalAmount' => sprintf("%01.2f", $totalAmount),
+            'year' => Carbon::today()->year,
+            'month' => Carbon::today()->month,
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
+        $startDate = Carbon::create($year, $month)->startOfMonth()->toDateString();
+        $endDate = Carbon::create($year, $month)->endOfMonth()->toDateString();
+
+        $user = Auth::user();
+
+        //早餐用餐天数
+        $breakfastDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast');
+        //早餐用餐总额
         $breakfastAmount = $breakfastDays * $user->price->breakfast;
 
         //午餐用餐天数
@@ -54,7 +93,10 @@ class HomeController extends Controller
             'dinnerDays' => $dinnerDays,
             'dinnerAmount' => sprintf("%01.2f", $dinnerAmount),
             'totalAmount' => sprintf("%01.2f", $totalAmount),
+            'year' => $year,
+            'month' => $month,
         ]);
+
     }
 
     /**
