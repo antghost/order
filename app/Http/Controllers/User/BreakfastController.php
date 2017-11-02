@@ -244,10 +244,6 @@ class BreakfastController extends Controller
                 $query->where('end_date','<=', $endDate);
             });
 
-        $breakfasts = $breakfasts->each(function ($tem){
-            return $tem;
-        })->put('days', 10);
-        dd($breakfasts);
         $breakfasts = $breakfasts->orderBy('begin_date')->paginate(15);
 
         //分页参数
