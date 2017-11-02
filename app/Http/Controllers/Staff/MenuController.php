@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Staff;
 
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -14,8 +15,8 @@ class MenuController extends Controller
      */
     public function index()
     {
-        //
-        return view('staff.menu.index');
+
+        return view('staff.menu.index', ['menus' => Menu::all()]);
     }
 
     /**
@@ -36,7 +37,20 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'string|required|max:100',
+            'type' => 'required|max:1',
+        ]);
+
+        $name = $request->input('name');
+        $type = $request->input('type');
+
+        $menu = Menu::create([
+            'name' => $name,
+            'type' => $type
+        ]);
+
+        return redirect()->back();
     }
 
     /**

@@ -55,11 +55,19 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-md-2">类型</label>
-                                    <div class="col-md-2">
-                                        <select name="type" class="form-control">
-                                            <option value="0" selected>假期</option>
-                                            <option value="1">上班</option>
-                                        </select>
+                                    {{--<div class="col-md-2">--}}
+                                        {{--<select name="type" class="form-control">--}}
+                                            {{--<option value="0" selected>假期</option>--}}
+                                            {{--<option value="1">上班</option>--}}
+                                        {{--</select>--}}
+                                    {{--</div>--}}
+                                    <div class="col-md-2 radio">
+                                        <label>
+                                            <input type="radio" name="type" value="0" checked>假期
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="type" value="1">上班
+                                        </label>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="submit" class="form-control btn btn-info" value="提交">
