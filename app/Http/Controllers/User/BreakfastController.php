@@ -244,6 +244,8 @@ class BreakfastController extends Controller
                 $query->where('end_date','<=', $endDate);
             });
 
+        dd($breakfasts->pluck('user_id','begin_date')->toJson());
+
         $breakfasts = $breakfasts->orderBy('begin_date')->paginate(15);
 
         //分页参数
@@ -251,8 +253,6 @@ class BreakfastController extends Controller
             'begin_date' => $beginDate,
             'end_date' => $endDate,
         ]);
-
-
 
         return view('user.breakfast.index', ['breakfasts' => $breakfasts]);
     }
