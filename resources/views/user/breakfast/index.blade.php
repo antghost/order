@@ -181,8 +181,9 @@
                     textFont: api.font({fontSize: 14})
                 }
             });
-
+//            console.log(group);
             return group;
+
         }
 
         option = {
@@ -209,6 +210,7 @@
                 range: '2017-11'
             }],
             series: [{
+                //自定义
                 type: 'custom',
                 coordinateSystem: 'calendar',
                 renderItem: renderItem,
