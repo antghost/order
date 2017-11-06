@@ -124,13 +124,15 @@
             var data = [];
             for (var time = date; time < end; time += dayTime) {
                 var items = [];
+                // pathes.length=4, eventCount:0~4随机整数
                 var eventCount = Math.round(Math.random() * pathes.length);
                 for (var i = 0; i < eventCount; i++) {
                     items.push(Math.round(Math.random() * (pathes.length - 1)));
                 }
+                // data结果形式：[1499356800000, 0|1|2|2]
                 data.push([
                     echarts.format.formatTime('yyyy-MM-dd', time),
-                    items.join('|')
+                    items.join('|') // items.join('|') 把数组中的所有元素转换为一个字符串用|分隔
                 ]);
             }
             return data;
@@ -140,12 +142,12 @@
             // api.value(0) 取出当前 dataItem 中第一个维度的数值。
             // api.coord(...) 将数值在当前坐标系中转换成为屏幕上的点的像素值。
             var cellPoint = api.coord(api.value(0));
-            console.log(api.value(0));
-            console.log(cellPoint);
+
             // 当前坐标系的包围盒
             var cellWidth = params.coordSys.cellWidth;
             var cellHeight = params.coordSys.cellHeight;
 
+            // api.value(1) 取出当前 dataItem 中第二个维度的数值。
             var value = api.value(1);
 
             /**
@@ -153,7 +155,7 @@
              * a() || b() :如果执行a()后返回true，则整个表达式返回a()的值，b()不执行；如果执行a()后返回false，则执行b()并返回b()的值；
              * && 优先级高于 ||
              */
-            var events = value && value.split('|');
+            var events = value && value.split('|');  //value.split('|') 把一个字符串分割成字符串数组
 
             if (isNaN(cellPoint[0]) || isNaN(cellPoint[1])) {
                 return;
