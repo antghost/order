@@ -137,11 +137,22 @@
         }
 
         function renderItem(params, api) {
+            // api.value(0) 取出当前 dataItem 中第一个维度的数值。
+            // api.coord(...) 将数值在当前坐标系中转换成为屏幕上的点的像素值。
             var cellPoint = api.coord(api.value(0));
+            console.log(api.value(0));
+            console.log(cellPoint);
+            // 当前坐标系的包围盒
             var cellWidth = params.coordSys.cellWidth;
             var cellHeight = params.coordSys.cellHeight;
 
             var value = api.value(1);
+
+            /**
+             * a() && b() :如果执行a()后返回true，则执行b()并返回b的值；如果执行a()后返回false，则整个表达式返回a()的值，b()不执行；
+             * a() || b() :如果执行a()后返回true，则整个表达式返回a()的值，b()不执行；如果执行a()后返回false，则执行b()并返回b()的值；
+             * && 优先级高于 ||
+             */
             var events = value && value.split('|');
 
             if (isNaN(cellPoint[0]) || isNaN(cellPoint[1])) {
@@ -187,16 +198,23 @@
         }
 
         option = {
+            //提示框组件
             tooltip: {
             },
+            //日历坐标系组件
             calendar: [{
+                //组件离容器左侧的距离'20%','left', 'center', 'right', 'middle'。
                 left: 'center',
+                //组件离容器上侧的距离'20%','left', 'center', 'right', 'middle'。
                 top: 'middle',
+                //日历每格框的大小，可设置单值或数组 第一个元素是宽 第二个元素是高。 支持设置自适应：auto, 默认为高宽均为20
                 cellSize: [70, 70],
+                //设置日历坐标中 年的样式
                 yearLabel: {
                     show: true,
                     margin: 40,
                 },
+                //日历坐标的布局朝向 ,水平：'horizontal'，垂直：'vertical'
                 orient: 'vertical',
                 dayLabel: {
                     margin: 20,
@@ -209,12 +227,22 @@
                 },
                 range: '2017-11'
             }],
+            //series系列列表。每个系列通过 type 决定自己的图表类型
             series: [{
-                //自定义
+                //custom 系列需要开发者自己提供图形渲染的逻辑
                 type: 'custom',
+                //该系列使用的坐标系
                 coordinateSystem: 'calendar',
+
+                //开发者自己提供图形渲染的逻辑
                 renderItem: renderItem,
-                dimensions: [null, {type: 'ordinal'}],
+
+                //使用 dimensions 定义 data 每个维度的信息
+                // 定义了每个维度的名称。这个名称会被显示到默认的 tooltip 中。
+                //dimensions: ['date', 'open', 'close', 'highest', 'lowest'],
+                dimensions: [null, // 如果此维度不想给出定义，则使用 null 即可
+                    {type: 'ordinal'} // 只定义此维度的类型。'ordinal' 表示离散型，一般文本使用这种类型。如果类型没有被定义，会自动猜测类型。
+                    ],
                 data: getVirtulData(2017)
             }]
         };
