@@ -42,7 +42,11 @@
                                <label class="control-label">月份</label>
                                <select class="form-control" name="month">
                                    @for($i = 12; $i >=1; $i--)
-                                       <option>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                       @if($i == \Carbon\Carbon::today()->month)
+                                           <option selected>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                       @else
+                                           <option>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                       @endif
                                    @endfor
                                </select>
                            </div>

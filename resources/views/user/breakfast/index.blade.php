@@ -25,24 +25,48 @@
                         </div>
 
                         <div class="col-md-12">
-
-                            <form action="{{ url('user/breakfast/s') }}" class="navbar-form navbar-left" role="search">
+                            <form class="navbar-form navbar-left" action="{{ url('user/breakfast/s') }}" method="get">
                                 <div class="form-group">
-                                    <label for="startdate">开始日期</label>
-                                    <input type="text" id="start_date" name="begin_date" class="form-control"
-                                           value="{{ \Carbon\Carbon::today()->startOfMonth()->toDateString() }}"
-                                           onclick="WdatePicker({
-                                           dateFmt:'yyyy-MM-dd',
-                                           maxDate:'#F{$dp.$D(\'end_date\')}' })">
+                                    <label class="control-label">年份</label>
+                                    <select class="form-control" name="year">
+                                        @for($i = \Carbon\Carbon::today()->year; $i >= 2010; $i--)
+                                            <option>{{ $i }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="enddate">结束日期</label>
-                                    <input type="text" id="end_date" name="end_date" class="form-control"
-                                           value="{{ \Carbon\Carbon::today()->endOfMonth()->toDateString() }}"
-                                           onclick="WdatePicker({
-                                           dateFmt:'yyyy-MM-dd',
-                                           minDate:'#F{$dp.$D(\'start_date\')}'})">
+                                    <label class="control-label">月份</label>
+                                    <select class="form-control" name="month">
+                                        @for($i = 12; $i >=1; $i--)
+                                            @if($i == \Carbon\Carbon::today()->month)
+                                                <option selected>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                            @else
+                                            <option>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                            @endif
+                                        @endfor
+                                    </select>
                                 </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-info">查询</button>
+                                </div>
+                            </form>
+                            {{--<form action="{{ url('user/breakfast/s') }}" class="navbar-form navbar-left" role="search">--}}
+                                {{--<div class="form-group">--}}
+                                    {{--<label for="startdate">开始日期</label>--}}
+                                    {{--<input type="text" id="start_date" name="begin_date" class="form-control"--}}
+                                           {{--value="{{ \Carbon\Carbon::today()->startOfMonth()->toDateString() }}"--}}
+                                           {{--onclick="WdatePicker({--}}
+                                           {{--dateFmt:'yyyy-MM-dd',--}}
+                                           {{--maxDate:'#F{$dp.$D(\'end_date\')}' })">--}}
+                                {{--</div>--}}
+                                {{--<div class="form-group">--}}
+                                    {{--<label for="enddate">结束日期</label>--}}
+                                    {{--<input type="text" id="end_date" name="end_date" class="form-control"--}}
+                                           {{--value="{{ \Carbon\Carbon::today()->endOfMonth()->toDateString() }}"--}}
+                                           {{--onclick="WdatePicker({--}}
+                                           {{--dateFmt:'yyyy-MM-dd',--}}
+                                           {{--minDate:'#F{$dp.$D(\'start_date\')}'})">--}}
+                                {{--</div>--}}
                                 {{--<div class="form-group">--}}
                                     {{--<input type="checkbox" checked id="book" name="book">--}}
                                     {{--<label for="book">开餐 </label>--}}
@@ -51,10 +75,10 @@
                                     {{--<input type="checkbox" checked id="cancel" name="cancel">--}}
                                     {{--<label for="cancel">停餐 </label>--}}
                                 {{--</div>--}}
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-info">查询</button>
-                                </div>
-                            </form>
+                                {{--<div class="form-group">--}}
+                                    {{--<button type="submit" class="btn btn-info">查询</button>--}}
+                                {{--</div>--}}
+                            {{--</form>--}}
                         </div>
 
                         {{--<div class="col-md-12">--}}
@@ -162,7 +186,9 @@
             }
 
             var group = {
+                // 一组图形元素
                 type: 'group',
+                // echarts.util.map 这个帮忙方法其行为和Array.prototype.map一样
                 children: echarts.util.map(layouts[events.length - 1], function (itemLayout, index) {
                     return {
                         type: 'path',
@@ -173,10 +199,13 @@
                             width: 16,
                             height: 16
                         },
+                        // 绝对位置，相对于容器左侧 , 上侧
                         position: [
                             cellPoint[0] + echarts.number.linearMap(itemLayout[0], [-0.5, 0.5], [-cellWidth / 2, cellWidth / 2]),
                             cellPoint[1] + echarts.number.linearMap(itemLayout[1], [-0.5, 0.5], [-cellHeight / 2 + 20, cellHeight / 2])
                         ],
+                        // 用 api.style(...) 函数，他能得到 series.itemStyle.normal 中定义的样式信息，以及视觉映射的样式信息。
+                        // 也可以用这种方式覆盖这些样式信息：api.style({fill: 'green', stroke: 'yellow'})。
                         style: api.style({
                             fill: colors[events[index]]
                         })
