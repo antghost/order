@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\User;
 
-use function foo\func;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\BookBreakfast;
+use App\Models\BookDinner;
+use App\Models\BookLunch;
+use App\Models\Calendar;
 
 class BreakfastController extends Controller
 {
@@ -46,9 +48,10 @@ class BreakfastController extends Controller
 
         //当开始日期为昨天或之前时限制为只读
         if (isset($bookFirst)){
-            //停餐开始日期
+            //停餐开始日期=开餐最小日期为前段记录结束日期+1
             $cancelBeginDate = Carbon::parse($bookFirst->end_date)->copy()->addDay();
             $bookFirstBeginDate = Carbon::parse($bookFirst->begin_date);
+            //前段记录开始日期小于当天或在当天但大于开餐时限时，设置日期选择为只读
             ($bookFirstBeginDate->lt(Carbon::today())
                 || ($bookFirstBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
                 ? $bookFirstReadonly = true : $bookFirstReadonly = false;
@@ -61,17 +64,19 @@ class BreakfastController extends Controller
             //停餐结束日期
             $cancelEndDate = Carbon::parse($bookSecond->begin_date)->subDay();
             $bookSecondBeginDate = Carbon::parse($bookSecond->begin_date);
+            //后段记录开始日期小于当天或在当天但大于开餐时限时，设置日期选择为只读
             ($bookSecondBeginDate->lt(Carbon::today())
                 || ($bookSecondBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
                 ? $bookSecondReadonly = true : $bookSecondReadonly = false;
-            //如果前段有效记录存在，开餐最小日期为前期记录结束日期+1
+            //如果前段有效记录存在，开餐最小日期为前段记录结束日期+1（即停餐开始日期）
             if (isset($bookFirst)) $bookMinDate = $cancelBeginDate->toDateString();
         } else {
             $cancelEndDate = null;
             $bookSecondReadonly = false;
         }
-        //当停餐开始日期$cancelBeginDate为null时
+        //当停餐开始日期$cancelBeginDate为null时，停餐结束日期也为null
         if (is_null($cancelBeginDate)) $cancelEndDate = null;
+        //当停餐开始与结束日期都不为空但开始日期大于结束日期时，设置两者都为空
         if (!is_null($cancelBeginDate) && !is_null($cancelEndDate) && $cancelBeginDate->gt($cancelEndDate)) {
             $cancelBeginDate = null;
             $cancelEndDate = null;
@@ -79,6 +84,7 @@ class BreakfastController extends Controller
         if (!is_null($cancelBeginDate)) $cancelBeginDate = $cancelBeginDate->toDateString();
         if (!is_null($cancelEndDate)) $cancelEndDate = $cancelEndDate->toDateString();
 
+        //停餐开始日期小于当天或在当天但大于停餐时限时，设置日期选择为只读
         (Carbon::parse($cancelBeginDate)->lt(Carbon::today())
             || (Carbon::parse($cancelBeginDate)->eq(Carbon::today()) && date('H:i:s')>$orderTime->cancel_time) )
             ? $cancelReadonly = true : $cancelReadonly = false;
@@ -228,32 +234,120 @@ class BreakfastController extends Controller
      */
     public function s(Request $request)
     {
-        $request->flashOnly(['begin_date','end_date']);
-
         $user = Auth::user();
-        $beginDate = $request->input('begin_date');
-        $endDate = $request->input('end_date');
+        $year = $request->input('year');
+        $month = $request->input('month');
 
-        $breakfasts = $user->bookBreakfasts()
-            //开始日期
-            ->when($beginDate, function ($query) use ($beginDate){
-                $query->where('begin_date','>=', $beginDate);
+        $beginDate = Carbon::create($year, $month)->startOfMonth()->toDateString();
+        $endDate = Carbon::create($year, $month)->endOfMonth()->toDateString();
+
+        $this->allOfDays($beginDate, $endDate);
+
+        return view('user.breakfast.index');
+    }
+
+    private function allOfDays($startDate, $endDate, $method = null)
+    {
+        if (strtolower($method) == 'breakfast') {
+            $oneUser = Auth::user()->bookBreakfasts();
+            $twoUser = Auth::user()->bookBreakfasts();
+            $threeUser = Auth::user()->bookBreakfasts();
+        }
+        if (strtolower($method) == 'lunch') {
+            $oneUser = Auth::user()->bookLunches();
+            $twoUser = Auth::user()->bookLunches();
+            $threeUser = Auth::user()->bookLunches();
+        }
+        if (strtolower($method) == 'dinner') {
+            $oneUser = Auth::user()->bookDinners();
+            $twoUser = Auth::user()->bookDinners();
+            $threeUser = Auth::user()->bookDinners();
+        }
+
+        $holidays = [];
+        $workdays = [];
+        //假期
+        $holidayCollect = Calendar::where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+            ['type', '=', 0]
+        ])->select('begin_date')->get();
+        //补班
+        $workdayCollect = Calendar::where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+            ['type', '=', 1]
+        ])->select('begin_date')->get();
+
+        foreach ($holidayCollect as $holiday){
+             array_push($holidays, $holiday->begin_date);
+        }
+
+        foreach ($workdayCollect as $workday){
+            array_push($workdays, $workday->begin_date);
+        }
+
+        dd(isset($holidays));
+
+        $days = [];
+        //情况1：$startDate：10月1日，$endDate：10月31日，数据记录开始与结束日期都为10月
+        $oneRecords = $oneUser->where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+        ])->get();
+
+        if ($oneRecords->count() > 0){
+            foreach ($oneRecords as $oneRecord){
+                $workday = $this->diffOfWorkdays($oneRecord->begin_date, $oneRecord->end_date);
+                $holiday = $this->diffOfHolidays($oneRecord->begin_date, $oneRecord->end_date);
+                //实际天数=工作日天数减去假期天数
+                $dayCount = $dayCount + ($workday - $holiday);
+            }
+        }
+//        var_dump('$dayCount:'.$dayCount);
+
+        //情况2：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为9月或之前，结束日期为10月或之后(理论上应该只有1条这样的数据)
+        $twoRecord = $twoUser->where('begin_date', '<', $startDate)
+            ->where(function ($query) use ($startDate){
+                $query->where('end_date', '>=', $startDate)
+                    ->orWhereNull('end_date');
             })
-            //结束日期
-            ->when($endDate, function ($query) use ($endDate){
-                $query->where('end_date','<=', $endDate);
-            });
+            ->first();
+        //dd($twoRecord);
 
-        dd($breakfasts->pluck('user_id','begin_date')->toJson());
+        if (isset($twoRecord)){
+            //开始日期为$startDate，结束日期为$twoRecord->end_date或$endDate
+            (is_null($twoRecord->end_date)) ? $twoEndDate = $endDate :
+                ($twoRecord->end_date >= $endDate) ? $twoEndDate = $endDate : $twoEndDate = $twoRecord->end_date;
 
-        $breakfasts = $breakfasts->orderBy('begin_date')->paginate(15);
+            $workday = $this->diffOfWorkdays($startDate, $twoEndDate);
+            $holiday = $this->diffOfHolidays($startDate, $twoEndDate);
+            //实际天数=工作日天数减去假期天数
+            $dayCount = $dayCount + ($workday - $holiday);
+//            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
 
-        //分页参数
-        $breakfasts = $breakfasts->appends([
-            'begin_date' => $beginDate,
-            'end_date' => $endDate,
-        ]);
+        }
 
-        return view('user.breakfast.index', ['breakfasts' => $breakfasts]);
+        //情况3：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为10月，结束日期为11月或之后(理论上应该只有1条这样的数据)
+        $threeRecord = $threeUser->where([
+            ['begin_date', '<=', $endDate],
+            ['begin_date', '>=', $startDate]])
+            ->where(function ($query) use($endDate){
+                $query->where('end_date', '>', $endDate)
+                    ->orWhereNull('end_date');
+            })
+            ->first();
+
+        //dd($threeRecord);
+
+        if (isset($threeRecord)){
+            //开始日期为$threeRecord->begin_date，结束日期为$endDate
+            $workday = $this->diffOfWorkdays($threeRecord->begin_date, $endDate);
+            $holiday = $this->diffOfHolidays($threeRecord->begin_date, $endDate);
+            //实际天数=工作日天数减去假期天数
+            $dayCount = $dayCount + ($workday - $holiday);
+//            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
+
+        }
     }
 }
