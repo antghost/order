@@ -227,23 +227,31 @@ class BreakfastController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * 搜索
-     * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
+
     public function s(Request $request)
     {
-        $user = Auth::user();
         $year = $request->input('year');
         $month = $request->input('month');
+        $allDays = [];
+        $bookDays = [];
 
-        $beginDate = Carbon::create($year, $month)->startOfMonth()->toDateString();
-        $endDate = Carbon::create($year, $month)->endOfMonth()->toDateString();
+        $beginDate = Carbon::create($year, $month)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
 
-        $this->allOfDays($beginDate, $endDate);
+        //开餐详细日期
+        $bookDays = $this->allOfDays($beginDate, $endDate, 'breakfast');
+        //按日期转化为echarts日历图表所需要的数组形式
+        for ($start = $beginDate; $start->lte($endDate); $start->addDay())
+        {
+            $temp = [];
+            (in_array($start->toDateString(), $bookDays)) ? $temp = [$start->toDateString(), '早餐']
+                : $temp = [$start->toDateString() , ''];
+            array_push($allDays, $temp);
+        }
 
-        return view('user.breakfast.index');
+        //echarts日历图表range: month,data: data
+        $data = ['month' => $year.'-'.$month, 'data' => $allDays];
+        return $data;
     }
 
     private function allOfDays($startDate, $endDate, $method = null)
@@ -264,6 +272,54 @@ class BreakfastController extends Controller
             $threeUser = Auth::user()->bookDinners();
         }
 
+        $days = [];
+        //情况1：$startDate：10月1日，$endDate：10月31日，数据记录开始与结束日期都为10月
+        $oneRecords = $oneUser->where([
+            ['begin_date', '>=', $startDate],
+            ['end_date', '<=', $endDate],
+        ])->get();
+
+        if ($oneRecords->count() > 0){
+            foreach ($oneRecords as $oneRecord){
+                $days = $this->detailInDays($oneRecord->begin_date, $oneRecord->end_date, $days);
+            }
+        }
+
+        //情况2：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为9月或之前，结束日期为10月或之后(理论上应该只有1条这样的数据)
+        $twoRecord = $twoUser->where('begin_date', '<', $startDate)
+            ->where(function ($query) use ($startDate){
+                $query->where('end_date', '>=', $startDate)
+                    ->orWhereNull('end_date');
+            })
+            ->first();
+
+        if (isset($twoRecord)){
+            //开始日期为$startDate，结束日期为$twoRecord->end_date或$endDate
+            (is_null($twoRecord->end_date)) ? $twoEndDate = $endDate :
+                ($twoRecord->end_date >= $endDate) ? $twoEndDate = $endDate : $twoEndDate = $twoRecord->end_date;
+            $days = $this->detailInDays($startDate, $twoEndDate, $days);
+        }
+
+        //情况3：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为10月，结束日期为11月或之后(理论上应该只有1条这样的数据)
+        $threeRecord = $threeUser->where([
+            ['begin_date', '<=', $endDate],
+            ['begin_date', '>=', $startDate]])
+            ->where(function ($query) use($endDate){
+                $query->where('end_date', '>', $endDate)
+                    ->orWhereNull('end_date');
+            })
+            ->first();
+
+        if (isset($threeRecord)){
+            //开始日期为$threeRecord->begin_date，结束日期为$endDate
+            $days = $this->detailInDays($threeRecord->begin_date, $endDate, $days);
+        }
+
+        return $days;
+    }
+
+    private function detailInDays($startDate, $endDate, array $days)
+    {
         $holidays = [];
         $workdays = [];
         //假期
@@ -280,74 +336,32 @@ class BreakfastController extends Controller
         ])->select('begin_date')->get();
 
         foreach ($holidayCollect as $holiday){
-             array_push($holidays, $holiday->begin_date);
+            array_push($holidays, $holiday->begin_date);
         }
 
         foreach ($workdayCollect as $workday){
             array_push($workdays, $workday->begin_date);
         }
 
-        dd(isset($holidays));
-
-        $days = [];
-        //情况1：$startDate：10月1日，$endDate：10月31日，数据记录开始与结束日期都为10月
-        $oneRecords = $oneUser->where([
-            ['begin_date', '>=', $startDate],
-            ['end_date', '<=', $endDate],
-        ])->get();
-
-        if ($oneRecords->count() > 0){
-            foreach ($oneRecords as $oneRecord){
-                $workday = $this->diffOfWorkdays($oneRecord->begin_date, $oneRecord->end_date);
-                $holiday = $this->diffOfHolidays($oneRecord->begin_date, $oneRecord->end_date);
-                //实际天数=工作日天数减去假期天数
-                $dayCount = $dayCount + ($workday - $holiday);
+        $start = Carbon::parse($startDate)->copy();
+        $end =  Carbon::parse($endDate)->copy();
+        //将范围中属于工作日的日期取出（排除假期日期，加上补班日期）
+        for ($day = $start; $day->lte($end); $day->addDay()){
+            if ($day->isWeekday()){
+                //工作中如果是假期则排除
+                if (!empty($holidays)){
+                    if (!in_array($day->toDateString(), $holidays)) array_push($days, $day->toDateString());
+                } else {
+                    array_push($days, $day->toDateString());
+                }
+            } else {
+                //周末中如果是补班则添加
+                if (!empty($workdays)){
+                    if (in_array($day->toDateString(), $workdays)) array_push($days, $day->toDateString());
+                }
             }
         }
-//        var_dump('$dayCount:'.$dayCount);
 
-        //情况2：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为9月或之前，结束日期为10月或之后(理论上应该只有1条这样的数据)
-        $twoRecord = $twoUser->where('begin_date', '<', $startDate)
-            ->where(function ($query) use ($startDate){
-                $query->where('end_date', '>=', $startDate)
-                    ->orWhereNull('end_date');
-            })
-            ->first();
-        //dd($twoRecord);
-
-        if (isset($twoRecord)){
-            //开始日期为$startDate，结束日期为$twoRecord->end_date或$endDate
-            (is_null($twoRecord->end_date)) ? $twoEndDate = $endDate :
-                ($twoRecord->end_date >= $endDate) ? $twoEndDate = $endDate : $twoEndDate = $twoRecord->end_date;
-
-            $workday = $this->diffOfWorkdays($startDate, $twoEndDate);
-            $holiday = $this->diffOfHolidays($startDate, $twoEndDate);
-            //实际天数=工作日天数减去假期天数
-            $dayCount = $dayCount + ($workday - $holiday);
-//            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
-
-        }
-
-        //情况3：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为10月，结束日期为11月或之后(理论上应该只有1条这样的数据)
-        $threeRecord = $threeUser->where([
-            ['begin_date', '<=', $endDate],
-            ['begin_date', '>=', $startDate]])
-            ->where(function ($query) use($endDate){
-                $query->where('end_date', '>', $endDate)
-                    ->orWhereNull('end_date');
-            })
-            ->first();
-
-        //dd($threeRecord);
-
-        if (isset($threeRecord)){
-            //开始日期为$threeRecord->begin_date，结束日期为$endDate
-            $workday = $this->diffOfWorkdays($threeRecord->begin_date, $endDate);
-            $holiday = $this->diffOfHolidays($threeRecord->begin_date, $endDate);
-            //实际天数=工作日天数减去假期天数
-            $dayCount = $dayCount + ($workday - $holiday);
-//            var_dump('$workday:'.$workday.'$holiday:'.$holiday.'$dayCount:'.$dayCount);
-
-        }
+        return $days;
     }
 }

@@ -153,7 +153,7 @@
                 for (var i = 0; i < eventCount; i++) {
                     items.push(Math.round(Math.random() * (pathes.length - 1)));
                 }
-                // data结果形式：[1499356800000, 0|1|2|2]
+                // data结果形式：["2017-11-11", "0|1|2|2"]
                 data.push([
                     echarts.format.formatTime('yyyy-MM-dd', time),
                     items.join('|') // items.join('|') 把数组中的所有元素转换为一个字符串用|分隔
@@ -193,7 +193,7 @@
                     return {
                         type: 'path',
                         shape: {
-                            pathData: pathes[events[index]],
+                            pathData: pathes[index + 1],//pathes[events[index]],
                             x: -8,
                             y: -8,
                             width: 16,
@@ -207,7 +207,7 @@
                         // 用 api.style(...) 函数，他能得到 series.itemStyle.normal 中定义的样式信息，以及视觉映射的样式信息。
                         // 也可以用这种方式覆盖这些样式信息：api.style({fill: 'green', stroke: 'yellow'})。
                         style: api.style({
-                            fill: colors[events[index]]
+                            fill: colors[index + 1]//colors[events[index]]
                         })
                     };
                 }) || []
@@ -228,6 +228,7 @@
 
         }
 
+        $.get('http://localhost/order/public/user/breakfast/s?year=2017&month=10').done(function (data) {
         option = {
             //提示框组件
             tooltip: {
@@ -256,7 +257,7 @@
                     show: true,
                     nameMap: 'cn'
                 },
-                range: '2017-11'
+                range: data.month
             }],
             //series系列列表。每个系列通过 type 决定自己的图表类型
             series: [{
@@ -274,10 +275,13 @@
                 dimensions: [null, // 如果此维度不想给出定义，则使用 null 即可
                     {type: 'ordinal'} // 只定义此维度的类型。'ordinal' 表示离散型，一般文本使用这种类型。如果类型没有被定义，会自动猜测类型。
                     ],
-                data: getVirtulData(2017)
+//                data: getVirtulData(2017)
+                data: data.data
             }]
         };
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
+        });
+
     </script>
 @endsection
