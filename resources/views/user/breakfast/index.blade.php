@@ -25,10 +25,10 @@
                         </div>
 
                         <div class="col-md-12">
-                            <form class="navbar-form navbar-left" action="{{ url('user/breakfast/s') }}" method="get">
+                            <form class="navbar-form navbar-left" action="" method="get">
                                 <div class="form-group">
                                     <label class="control-label">年份</label>
-                                    <select class="form-control" name="year">
+                                    <select class="form-control" name="year" id="year">
                                         @for($i = \Carbon\Carbon::today()->year; $i >= 2010; $i--)
                                             <option>{{ $i }}</option>
                                         @endfor
@@ -36,7 +36,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">月份</label>
-                                    <select class="form-control" name="month">
+                                    <select class="form-control" name="month" id="month">
                                         @for($i = 12; $i >=1; $i--)
                                             @if($i == \Carbon\Carbon::today()->month)
                                                 <option selected>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
@@ -47,7 +47,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-info">查询</button>
+                                    <button type="button" onclick="getEchart()" class="btn btn-info">查询</button>
                                 </div>
                             </form>
                             {{--<form action="{{ url('user/breakfast/s') }}" class="navbar-form navbar-left" role="search">--}}
@@ -228,60 +228,70 @@
 
         }
 
-        $.get('http://localhost/order/public/user/breakfast/s?year=2017&month=10').done(function (data) {
-        option = {
-            //提示框组件
-            tooltip: {
-            },
-            //日历坐标系组件
-            calendar: [{
-                //组件离容器左侧的距离'20%','left', 'center', 'right', 'middle'。
-                left: 'center',
-                //组件离容器上侧的距离'20%','left', 'center', 'right', 'middle'。
-                top: 'middle',
-                //日历每格框的大小，可设置单值或数组 第一个元素是宽 第二个元素是高。 支持设置自适应：auto, 默认为高宽均为20
-                cellSize: [70, 70],
-                //设置日历坐标中 年的样式
-                yearLabel: {
-                    show: true,
-                    margin: 40,
-                },
-                //日历坐标的布局朝向 ,水平：'horizontal'，垂直：'vertical'
-                orient: 'vertical',
-                dayLabel: {
-                    margin: 20,
-                    firstDay: 0,
-                    nameMap: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-                },
-                monthLabel: {
-                    show: true,
-                    nameMap: 'cn'
-                },
-                range: data.month
-            }],
-            //series系列列表。每个系列通过 type 决定自己的图表类型
-            series: [{
-                //custom 系列需要开发者自己提供图形渲染的逻辑
-                type: 'custom',
-                //该系列使用的坐标系
-                coordinateSystem: 'calendar',
+        function getEchart() {
+            var year = $("#year").val();
+            var month = $("#month").val();
+            var url = "{{ url('user/breakfast/s') }}";
+            url = url+'?year='+year+'&month='+month;
 
-                //开发者自己提供图形渲染的逻辑
-                renderItem: renderItem,
+            $.get(url).done(function (data) {
+                option = {
+                    //提示框组件
+                    tooltip: {
+                    },
+                    //日历坐标系组件
+                    calendar: [{
+                        //组件离容器左侧的距离'20%','left', 'center', 'right', 'middle'。
+                        left: 'center',
+                        //组件离容器上侧的距离'20%','left', 'center', 'right', 'middle'。
+                        top: 'middle',
+                        //日历每格框的大小，可设置单值或数组 第一个元素是宽 第二个元素是高。 支持设置自适应：auto, 默认为高宽均为20
+                        cellSize: [70, 70],
+                        //设置日历坐标中 年的样式
+                        yearLabel: {
+                            show: true,
+                            margin: 40,
+                        },
+                        //日历坐标的布局朝向 ,水平：'horizontal'，垂直：'vertical'
+                        orient: 'vertical',
+                        dayLabel: {
+                            margin: 20,
+                            firstDay: 0,
+                            nameMap: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+                        },
+                        monthLabel: {
+                            show: true,
+                            nameMap: 'cn'
+                        },
+                        range: data.month
+                    }],
+                    //series系列列表。每个系列通过 type 决定自己的图表类型
+                    series: [{
+                        //custom 系列需要开发者自己提供图形渲染的逻辑
+                        type: 'custom',
+                        //该系列使用的坐标系
+                        coordinateSystem: 'calendar',
 
-                //使用 dimensions 定义 data 每个维度的信息
-                // 定义了每个维度的名称。这个名称会被显示到默认的 tooltip 中。
-                //dimensions: ['date', 'open', 'close', 'highest', 'lowest'],
-                dimensions: [null, // 如果此维度不想给出定义，则使用 null 即可
-                    {type: 'ordinal'} // 只定义此维度的类型。'ordinal' 表示离散型，一般文本使用这种类型。如果类型没有被定义，会自动猜测类型。
-                    ],
-//                data: getVirtulData(2017)
-                data: data.data
-            }]
-        };
-        // 使用刚指定的配置项和数据显示图表。
-        myChart.setOption(option);
-        });
+                        //开发者自己提供图形渲染的逻辑
+                        renderItem: renderItem,
+
+                        //使用 dimensions 定义 data 每个维度的信息
+                        // 定义了每个维度的名称。这个名称会被显示到默认的 tooltip 中。
+                        //dimensions: ['date', 'open', 'close', 'highest', 'lowest'],
+                        dimensions: [null, // 如果此维度不想给出定义，则使用 null 即可
+                            {type: 'ordinal'} // 只定义此维度的类型。'ordinal' 表示离散型，一般文本使用这种类型。如果类型没有被定义，会自动猜测类型。
+                        ],
+//                        data: getVirtulData(2017)
+                        data: data.data
+                    }]
+                };
+
+                // 清空画布，防止缓存
+                myChart.clear();
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            });
+        }
 
     </script>
 @endsection

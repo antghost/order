@@ -42,10 +42,14 @@ class BreakfastController extends Controller
             : $cancelMinDate = $today->toDateString();
 
         //前段有效记录
-        $bookFirst = $user->bookBreakfasts()->whereNotNull('end_date')->where('end_date', '>=', $today->toDateString())->first();
+        $bookFirst = $user->bookBreakfasts()->whereNotNull('end_date')->where('end_date', '>=', $today->toDateString())->get();
         //后段有效记录
         $bookSecond = $user->bookBreakfasts()->whereNull('end_date')->first();
 
+        //当前段有两条记录时
+        if ($bookFirst->count() > 0) {
+            dd($bookFirst);
+        }
         //当开始日期为昨天或之前时限制为只读
         if (isset($bookFirst)){
             //停餐开始日期=开餐最小日期为前段记录结束日期+1
