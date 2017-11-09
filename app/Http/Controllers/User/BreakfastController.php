@@ -41,24 +41,49 @@ class BreakfastController extends Controller
         date('H:i:s') > $orderTime->cancel_time ? $cancelMinDate = $today->copy()->addDay()->toDateString()
             : $cancelMinDate = $today->toDateString();
 
-        //前段有效记录
-        $bookFirst = $user->bookBreakfasts()->whereNotNull('end_date')->where('end_date', '>=', $today->toDateString())->get();
-        //后段有效记录
-        $bookSecond = $user->bookBreakfasts()->whereNull('end_date')->first();
+//        //前段有效记录
+//        $bookFirst = $user->bookBreakfasts()->whereNotNull('end_date')->where('end_date', '>=', $today->toDateString())->first();
+//        //后段有效记录
+//        $bookSecond = $user->bookBreakfasts()->whereNull('end_date')->first();
+        $bookRecords = $user->bookBreakfasts()
+            ->where(function ($query) use ($today) {
+                $query->whereNull('end_date')->orWhere('end_date', '>=', $today->toDateString());
+            })->orderBy('begin_date');
 
-        //当前段有两条记录时
-        if ($bookFirst->count() > 0) {
-            dd($bookFirst);
+        $bookFirst = null;
+        $bookSecond = null;
+
+        if ($bookRecords->count() == 0) {
+            $bookFirst = null;
+            $bookSecond = null;
         }
+
+        if ($bookRecords->count() == 1) {
+            // 前段有效记录
+            $bookFirst = $bookRecords->first();
+            $bookSecond = null;
+        }
+
+        if ($bookRecords->count() == 2) {
+            // 前段有效记录
+            $bookFirst = $bookRecords->limit(1)->first();
+            // 后段有效记录 略过第一条数据取第二条
+            $bookSecond = $bookRecords->offset(1)->limit(1)->first();
+        }
+
         //当开始日期为昨天或之前时限制为只读
         if (isset($bookFirst)){
-            //停餐开始日期=开餐最小日期为前段记录结束日期+1
-            $cancelBeginDate = Carbon::parse($bookFirst->end_date)->copy()->addDay();
+            //停餐开始日期=为前段记录结束日期+1
+            is_null($bookFirst->end_date) ? $cancelBeginDate = null
+                :$cancelBeginDate = Carbon::parse($bookFirst->end_date)->copy()->addDay();
+            if (!is_null($cancelBeginDate)) $cancelMinDate = $cancelBeginDate;
             $bookFirstBeginDate = Carbon::parse($bookFirst->begin_date);
             //前段记录开始日期小于当天或在当天但大于开餐时限时，设置日期选择为只读
             ($bookFirstBeginDate->lt(Carbon::today())
                 || ($bookFirstBeginDate->eq(Carbon::today()) && date('H:i:s')>$orderTime->book_time) )
                 ? $bookFirstReadonly = true : $bookFirstReadonly = false;
+            //用于日历控件中的停餐最小日期值
+            if(!isset($bookSecond)) $cancelMinDate = $bookFirstBeginDate->copy()->toDateString();
         } else {
             $cancelBeginDate = null;
             $bookFirstReadonly = false;
@@ -186,6 +211,7 @@ class BreakfastController extends Controller
                         }
                     }
                 }
+                //if ($beginDate->eq())
                 //前段有效开餐记录的结束日期=停餐开始日期-1
                 $bookFirst = BookBreakfast::where('id', $bookFirstId)->update(['end_date' => $beginDate->copy()->subDay()]);
             }

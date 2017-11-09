@@ -229,6 +229,9 @@
         }
 
         function getEchart() {
+            //加载动画
+            myChart.showLoading();
+
             var year = $("#year").val();
             var month = $("#month").val();
             var url = "{{ url('user/breakfast/s') }}";
@@ -288,6 +291,8 @@
 
                 // 清空画布，防止缓存
                 myChart.clear();
+                //隐藏加载动画。
+                myChart.hideLoading();
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
             });
