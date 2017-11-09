@@ -80,39 +80,41 @@
                                         <tr>
                                             @if(isset($bookSecond))
                                                 <td>
-                                                    <input type="hidden" name="id" value="{{ $bookFirst->id or '' }}">
-                                                    <input type="text" id="book_begin_date" name="begin_date" required
+                                                    <input type="hidden" name="first_id" value="{{ $bookFirst->id or '' }}">
+                                                    {{--开始日期--}}
+                                                    <input type="text" id="book_first_begin_date" name="first_begin_date" required
                                                            readonly value="{{ $bookFirst->begin_date or '' }}" >
                                                 </td>
                                                 <td>
-                                                    <input type="text" id="book_begin_date" name="begin_date" required
+                                                    {{--结束日期--}}
+                                                    <input type="text" id="book_first_end_date" name="first_end_date" required
                                                            readonly value="{{ $bookFirst->end_date or '' }}" >
                                                 </td>
                                                 <td></td>
                                             @else
                                                 <td>
-                                                    <input type="hidden" name="id" value="{{ $bookFirst->id or '' }}">
+                                                    <input type="hidden" name="first_id" value="{{ $bookFirst->id or '' }}">
                                                     {{--开始日期--}}
                                                     @if ($bookFirstReadonly)
-                                                        <input type="text" id="book_begin_date" name="begin_date" required
+                                                        <input type="text" id="book_first_begin_date" name="first_begin_date" required
                                                                readonly value="{{ $bookFirst->begin_date or '' }}" >
                                                     @else
-                                                        <input type="text" id="book_begin_date" name="begin_date" required
+                                                        <input type="text" id="book_first_begin_date" name="first_begin_date" required
                                                                value="{{ $bookFirst->begin_date or '' }}"
                                                                onclick="WdatePicker({
                                                                        dateFmt:'yyyy-MM-dd',
                                                                        minDate:'{{ $bookMinDate }}',
-                                                                       maxDate:'#F{$dp.$D(\'book_end_date\')}'
+                                                                       maxDate:'#F{$dp.$D(\'book_first_end_date\')}'
                                                                        })">
                                                     @endif
                                                 </td>
                                                 <td>
                                                     {{--结束日期--}}
-                                                    <input type="text" id="book_end_date" name="end_date"
+                                                    <input type="text" id="book_first_end_date" name="first_end_date"
                                                            value="{{ $bookFirst->end_date or '' }}"
                                                            onclick="WdatePicker({
                                                                    dateFmt:'yyyy-MM-dd',
-                                                                   minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
+                                                                   minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_first_begin_date\')}'
                                                                    })">
                                                 </td>
                                                 <td>
@@ -125,28 +127,29 @@
                                     @if(isset($bookSecond))
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="id" value="{{ $bookSecond->id or '' }}">
+                                                <input type="hidden" name="second_id" value="{{ $bookSecond->id or '' }}">
                                                 {{--开始日期--}}
                                                 @if ($bookSecondReadonly)
-                                                    <input type="text" id="book_begin_date" name="begin_date" required
+                                                    <input type="text" id="book_second_begin_date" name="second_begin_date" required
                                                            readonly value="{{ $bookSecond->begin_date or '' }}" >
                                                 @else
-                                                    <input type="text" id="book_begin_date" name="begin_date" required
+                                                    <input type="text" id="book_second_begin_date" name="second_begin_date" required
                                                            value="{{ $bookSecond->begin_date or '' }}"
                                                            onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
                                                        minDate:'{{ $bookMinDate }}',
-                                                       maxDate:'#F{$dp.$D(\'book_end_date\')}'
+                                                       maxDate:'#F{$dp.$D(\'book_second_end_date\')}'
                                                        })">
                                                 @endif
                                             </td>
                                             <td>
                                                 {{--结束日期--}}
-                                                <input type="text" id="book_end_date" name="end_date"
+                                                <input type="text" id="book_second_end_date" name="second_end_date"
                                                        value="{{ $bookSecond->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                        dateFmt:'yyyy-MM-dd',
-                                                       minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_begin_date\')}'
+                                                       minDate:'#F{$dp.$D(\'book_second_begin_date\')}'
+                                                       {{--minDate:'#F{\'{{ $bookMinDate }}\' || $dp.$D(\'book_second_begin_date\')}'--}}
                                                        })">
                                             </td>
                                             <td>
@@ -164,11 +167,14 @@
                                 {{ csrf_field() }}
                                 <input type="hidden" name="type" value="cancel">
                                 @if (isset($bookFirst))
-                                    <input type="hidden" name="bookFirstId" value="{{ $bookFirst->id }}">
-                                    <input type="hidden" name="bookFirstEndDate" value="{{ $bookFirst->end_date }}">
+                                    <input type="hidden" name="first_id" value="{{ $bookFirst->id }}">
+                                    <input type="hidden" name="first_begin_date" value="{{ $bookFirst->begin_date }}">
+                                    <input type="hidden" name="first_end_date" value="{{ $bookFirst->end_date }}">
                                 @endif
                                 @if (isset($bookSecond))
-                                    <input type="hidden" name="bookSecondId" value="{{ $bookSecond->id }}">
+                                    <input type="hidden" name="second_id" value="{{ $bookSecond->id }}">
+                                    <input type="hidden" name="second_begin_date" value="{{ $bookSecond->begin_date }}">
+                                    <input type="hidden" name="second_end_date" value="{{ $bookSecond->end_date }}">
                                 @endif
                                 <span>停餐设置</span>
                                 <table class="table">
