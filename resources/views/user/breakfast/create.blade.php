@@ -54,7 +54,7 @@
                                     @if(!isset($bookFirst) && !isset($bookSecond))
                                         <tr>
                                             <td>
-                                                <input type="text" id="book_begin_date" name="begin_date" required
+                                                <input type="text" id="book_begin_date" name="book_begin_date" required
                                                        value="{{ $bookFirst->begin_date or '' }}"
                                                        onclick="WdatePicker({
                                                                dateFmt:'yyyy-MM-dd',
@@ -63,7 +63,7 @@
                                                                })">
                                             </td>
                                             <td>
-                                                <input type="text" id="book_end_date" name="end_date"
+                                                <input type="text" id="book_end_date" name="book_end_date"
                                                        value="{{ $bookFirst->end_date or '' }}"
                                                        onclick="WdatePicker({
                                                                dateFmt:'yyyy-MM-dd',

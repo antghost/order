@@ -149,36 +149,47 @@ class BreakfastController extends Controller
 
         //前段记录
         $firstId = $request->input('first_id');
-        $firstBeginDate = Carbon::parse($request->input('first_begin_date'));
+        $firstBeginDate = $request->input('first_begin_date');
         $firstEndDate = $request->input('first_end_date');
         //后段记录
         $secondId = $request->input('second_id');
-        $secondBeginDate = Carbon::parse($request->input('second_begin_date'));
+        $secondBeginDate = $request->input('second_begin_date');
         $secondEndDate = $request->input('second_end_date');
-
-        //停餐或新开餐开始日期
+        //新开餐日期
+        $bookBeginDate = $request->input('book_begin_date');
+        $bookEndDate = $request->input('book_end_date');
+        //停餐日期
         $beginDate = $request->input('begin_date');
-        //停餐或新开餐结束日期
         $endDate = $request->input('end_date');
 
         //开始日期不能大于结束日期判断
+        //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
+        if (!is_null($firstBeginDate)) $firstBeginDate = Carbon::parse($firstBeginDate);
         if (!is_null($firstEndDate)) {
-            //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
             $firstEndDate = Carbon::parse($firstEndDate);
             if ($firstBeginDate->gt($firstEndDate)) {
                 return redirect()->back()->withErrors('开始日期不能大于结束日期')->withInput();
             }
         }
+        //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
+        if (!is_null($secondBeginDate)) $secondBeginDate = Carbon::parse($secondBeginDate);
         if (!is_null($secondEndDate)) {
-            //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
             $secondEndDate = Carbon::parse($secondEndDate);
             if ($secondBeginDate->gt($secondEndDate)) {
                 return redirect()->back()->withErrors('开始日期不能大于结束日期')->withInput();
             }
         }
-        if (!is_null($endDate) && !is_null($beginDate)) {
-            //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
-            $beginDate = Carbon::parse($beginDate);
+        //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
+        if (!is_null($bookBeginDate)) $bookBeginDate = Carbon::parse($bookBeginDate);
+        if (!is_null($bookEndDate)) {
+            $bookEndDate = Carbon::parse($bookEndDate);
+            if ($bookBeginDate->gt($bookEndDate)) {
+                return redirect()->back()->withErrors('开始日期不能大于结束日期')->withInput();
+            }
+        }
+        //当$endDate=null时Carbon::parse()取当前时间，所以不能在$endDate=null时Carbon
+        if (!is_null($beginDate)) $beginDate = Carbon::parse($beginDate);
+        if (!is_null($endDate)) {
             $endDate = Carbon::parse($endDate);
             if ($beginDate->gt($endDate)) {
                 return redirect()->back()->withErrors('开始日期不能大于结束日期')->withInput();
@@ -187,202 +198,219 @@ class BreakfastController extends Controller
 
         //新增或修改开餐记录
         if ($type == 'book'){
-            dd(is_null($beginDate));
             //无有效开餐记录时新增
-            if (!is_null($beginDate)) {
-                $bookBreakfast = BookBreakfast::create(
+            if (!is_null($bookBeginDate)) {
+                $bookNew = BookBreakfast::create(
                     [
-                        'begin_date' => $beginDate,
-                        'end_date' => $endDate,
+                        'begin_date' => $bookBeginDate,
+                        'end_date' => $bookEndDate,
                         'user_id' => $user->id,
                     ]
                 );
-                if (isset($bookBreakfast)) {
+                if (isset($bookNew)) {
                     return redirect()->back()->with('status', '提交成功');
                 }
             }
-            //只有一条有效开餐记录时处理
-            if (!is_null($firstId) && is_null($secondId)){
-                $bookFirst = BookBreakfast::where('id', $firstId)->update([
-                    'begin_date' => $firstBeginDate->toDateString(),
-                    'end_date' => $firstEndDate->toDateString(),
-                ]);
+
+            if (!is_null($firstId)) {
+                if (is_null($secondId)) {
+                    $bookFirst = BookBreakfast::where('id', $firstId)->update([
+                        'begin_date' => $firstBeginDate,
+                        'end_date' => $firstEndDate,
+                    ]);
+                    if (isset($bookFirst)) {
+                        return redirect()->back()->with('status', '提交成功');
+                    }
+                } else {
+                    $bookSecond = BookBreakfast::where('id', $secondId)->update([
+                        'begin_date' => $secondBeginDate,
+                        'end_date' => $secondEndDate,
+                    ]);
+                    if (isset($bookSecond)) {
+                        return redirect()->back()->with('status', '提交成功');
+                    }
+                }
             }
-            //有两条有效开餐记录时处理
-            if (!is_null($firstId) && !is_null($secondId)){
-                $bookFirst = BookBreakfast::where('id', $secondId)->update([
-                    'begin_date' => $secondBeginDate->toDateString(),
-                    'end_date' => $secondEndDate->toDateString(),
-                ]);
-            }
+
         }
 
         //新增或修改停餐记录
         if ($type == 'cancel'){
             DB::beginTransaction();
 
-            if (!is_null($firstId) && is_null($secondId)) {
-                if ((!is_null($firstEndDate) && $beginDate->gt($firstEndDate)) || $endDate->lt($firstBeginDate) ) {
-                    return redirect()->back()->with('status', '该时间段没有开餐无须停餐，请重新设置');
-                }
-                // 停餐开始日期<=开餐开始日期，停餐结束日期为空或停餐结束日期>=开餐结束日期
-                if ($beginDate->lte($firstBeginDate) && (is_null($endDate) || (!is_null($endDate) && !is_null($firstEndDate) && $endDate->gte($firstEndDate)) ) ) {
-                    $bookFirst = BookBreakfast::where('id', $firstId)->delete();
-                }
-                // 停餐开始日期<=开餐开始日期，停餐结束日期不为空
-                if ($beginDate->lte($firstBeginDate) && !is_null($endDate)) {
-                    //开餐结束日期为空或（开餐结束日期不为空且大于停餐结束日期），修改开餐开始日期=停餐结束日期+1
-                    if (is_null($firstEndDate) || (!is_null($firstEndDate) && $endDate-lt($firstEndDate))) {
-                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['begin_date' => $endDate->copy()->addDay()]);
-                    }
-                }
-                // 停餐开始日期>开餐开始日期
-                if ($beginDate->gt($firstBeginDate)){
-                    //停餐结束日期为空或停餐结束日期>=开餐结束日期
-                    if (is_null($endDate) || (!is_null($endDate) && !is_null($firstEndDate) && $endDate->gte($firstEndDate))){
-                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                    }
-                    //停餐结束日期不为空或停餐结束日期<开餐结束日期
-                    if (!is_null($endDate) && (is_null($firstEndDate) || (!is_null($firstEndDate) && $endDate->lt($firstEndDate))) ){
-                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                        $bookSecond = BookBreakfast::create(
-                            [
-                                'begin_date' => $endDate->copy()->addDay(),
-                                'end_date' => $firstEndDate,
-                                'user_id' => $user->id,
-                            ]
-                        );
-                    }
-                }
-            }
-
-            if (!is_null($firstId) && !is_null($secondId)) {
-                if ((!is_null($secondEndDate) && $beginDate->gt($secondEndDate)) || $endDate->lt($firstBeginDate) ) {
-                    return redirect()->back()->with('status', '该时间段没有开餐无须停餐，请重新设置');
-                }
-                // 停餐开始日期<=前段开餐开始日期，停餐结束日期为空或停餐结束日期>=后段开餐结束日期
-                if ($beginDate->lte($firstBeginDate) && (is_null($endDate) || (!is_null($endDate) && !is_null($secondEndDate) && $endDate->gte($secondEndDate)) ) ) {
-                    $bookFirst = BookBreakfast::where('id', $firstId)->delete();
-                    $bookSecond = BookBreakfast::where('id', $secondId)->delete();
-                }
-                //停餐开始日期<=前段开餐开始日期并且停餐结束日期不为空
-                if ($beginDate->lte($firstBeginDate) && !is_null($endDate) ) {
-                    if ($endDate->lt($firstEndDate)) {
-                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['begin_date' => $endDate->copy()->addDay()]);
-                    }
-                    if ($endDate->gte($firstEndDate) && $endDate->lt($secondBeginDate)) {
-                        $bookFirst = BookBreakfast::where('id', $firstId)->delete();
-                    }
-                    if ($endDate->gte($secondBeginDate) && (is_null($secondEndDate) || (!is_null($secondEndDate) && $endDate->lt($secondEndDate))) ) {
-                        $bookFirst = BookBreakfast::where('id', $firstId)->delete();
-                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
-                    }
-                }
-                //停餐开始日期>前段开餐开始日期
-                if ($beginDate->gt($firstBeginDate)) {
-                    if (is_null($endDate) && $beginDate->lte($firstEndDate)) {
-                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                        $bookSecond = BookBreakfast::where('id', $secondId)->delete();
-                    }
-                    if (is_null($endDate) && $beginDate->gt($firstEndDate)) {
-                        $bookSecond = BookBreakfast::where('id', $secondId)->delete();
-                    }
-                    if (is_null($endDate) && $beginDate->gt($secondBeginDate)) {
-                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                    }
-                    //停餐结束日期不为空并且停餐开始日期<=前段开餐结束日期并且停餐结束日期<=前段开餐结束日期
-                    if (!is_null($endDate) && $beginDate->lte($firstEndDate) && $endDate->lte($firstEndDate)) {
-                        //目前暂这样处理不然会出现分段数据造成三个分段
-                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                    }
-                    //停餐结束日期不为空并且停餐开始日期<=前段开餐结束日期并且停餐结束日期>=后段开餐开始日期
-                    if (!is_null($endDate) && $beginDate->lte($firstEndDate) && $endDate->gte($secondBeginDate)) {
-                        if (is_null($secondEndDate) || ( !is_null($secondEndDate) && $endDate-lt($secondEndDate) )) {
-                            $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
-                        }
-                        if (!is_null($secondEndDate) && $endDate->gte($secondEndDate)) {
-                            $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                            $bookSecond = BookBreakfast::where('id', $secondId)->delete();
-                        }
-                    }
-                    //停餐结束日期不为空并且停餐开始日期>=后段开餐开始日期
-                    if (!is_null($endDate) && $beginDate->gte($secondBeginDate)) {
-                        if (is_null($secondEndDate) && $beginDate->eq($secondBeginDate)) {
-                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
-                        }
-                        if (is_null($secondEndDate) && $beginDate->gt($secondBeginDate)) {
-                            //暂不作处理不然会产生三段数据
-                            return redirect()->back()->with('status', '请在'.$firstEndDate.'之后再设置。');
-                        }
-                        if (!is_null($secondEndDate) && $beginDate->eq($secondBeginDate) && $endDate->gte($secondEndDate)) {
-                            $bookSecond = BookBreakfast::where('id', $secondId)->delete();
-                        }
-                        if (!is_null($secondEndDate) && $beginDate->gt($secondBeginDate) && $beginDate->lt($secondEndDate) && $endDate->gte($secondEndDate)){
-                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
-                        }
-                        if (!is_null($secondEndDate) && $beginDate->gt($secondBeginDate) && $endDate->lt($secondEndDate)){
-                            //暂不作处理不然会产生三段数据
-                            return redirect()->back()->with('status', '请在'.$firstEndDate.'之后再设置。');
-                        }
-                    }
-                }
-            }
-
-//            //开餐结束日期不为空的有效记录处理
-//            if (!is_null($firstId)){
-//                //开餐结束日期为空的记录不存在时处理
-//                if (is_null($secondId)){
-//                    //当停餐开始日期大于有效开餐日期时直接返回
-//                    if ($beginDate->gt($firstEndDate)) {
-//                        return redirect()->back()->with('status', '该时间段没有开餐无须停餐');
-//                    } else {
-//                        //当停餐结束日期小于开餐结束日期时插入开餐后段有效记录
-//                        if (!is_null($endDate)) {
-//                            if ($endDate->lt($firstEndDate)) {
-//                                $bookSecond = BookBreakfast::create([
-//                                    'begin_date' => $endDate->copy()->addDay(),
-//                                    'end_date' => $firstEndDate,
-//                                    'user_id' => $user->id,
-//                                ]);
-//                            }
+//            if (!is_null($firstId) && is_null($secondId)) {
+//                if ((!is_null($firstEndDate) && $beginDate->gt($firstEndDate)) || (!is_null($endDate) && $endDate->lt($firstBeginDate)) ) {
+//                    return redirect()->back()->with('status', '该时间段没有开餐无须停餐，请重新设置');
+//                }
+//                // 停餐开始日期<=开餐开始日期，停餐结束日期为空或停餐结束日期>=开餐结束日期
+//                if ($beginDate->lte($firstBeginDate) && (is_null($endDate) || (!is_null($endDate) && !is_null($firstEndDate) && $endDate->gte($firstEndDate)) ) ) {
+//                    $bookFirst = BookBreakfast::where('id', $firstId)->delete();
+//                }
+//                // 停餐开始日期<=开餐开始日期，停餐结束日期不为空
+//                if ($beginDate->lte($firstBeginDate) && !is_null($endDate)) {
+//                    //开餐结束日期为空或（开餐结束日期不为空且大于停餐结束日期），修改开餐开始日期=停餐结束日期+1
+//                    if (is_null($firstEndDate) || (!is_null($firstEndDate) && $endDate-lt($firstEndDate))) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['begin_date' => $endDate->copy()->addDay()]);
+//                    }
+//                }
+//                // 停餐开始日期>开餐开始日期
+//                if ($beginDate->gt($firstBeginDate)){
+//                    //停餐结束日期为空或停餐结束日期>=开餐结束日期
+//                    if (is_null($endDate) || (!is_null($endDate) && !is_null($firstEndDate) && $endDate->gte($firstEndDate))){
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                    }
+//                    //停餐结束日期不为空或停餐结束日期<开餐结束日期
+//                    if (!is_null($endDate) && (is_null($firstEndDate) || (!is_null($firstEndDate) && $endDate->lt($firstEndDate))) ){
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                        $bookSecond = BookBreakfast::create(
+//                            [
+//                                'begin_date' => $endDate->copy()->addDay(),
+//                                'end_date' => $firstEndDate,
+//                                'user_id' => $user->id,
+//                            ]
+//                        );
+//                    }
+//                }
+//            }
+//
+//            if (!is_null($firstId) && !is_null($secondId)) {
+//                if ((!is_null($secondEndDate) && $beginDate->gt($secondEndDate)) || (!is_null($endDate) && $endDate->lt($firstBeginDate)) ) {
+//                    return redirect()->back()->with('status', '该时间段没有开餐无须停餐，请重新设置');
+//                }
+//                // 停餐开始日期<=前段开餐开始日期，停餐结束日期为空或停餐结束日期>=后段开餐结束日期
+//                if ($beginDate->lte($firstBeginDate) && (is_null($endDate) || (!is_null($endDate) && !is_null($secondEndDate) && $endDate->gte($secondEndDate)) ) ) {
+//                    $bookFirst = BookBreakfast::where('id', $firstId)->delete();
+//                    $bookSecond = BookBreakfast::where('id', $secondId)->delete();
+//                }
+//                //停餐开始日期<=前段开餐开始日期并且停餐结束日期不为空
+//                if ($beginDate->lte($firstBeginDate) && !is_null($endDate) ) {
+//                    if ($endDate->lt($firstEndDate)) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['begin_date' => $endDate->copy()->addDay()]);
+//                    }
+//                    if ($endDate->gte($firstEndDate) && $endDate->lt($secondBeginDate)) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->delete();
+//                    }
+//                    if ($endDate->gte($secondBeginDate) && (is_null($secondEndDate) || (!is_null($secondEndDate) && $endDate->lt($secondEndDate))) ) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->delete();
+//                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
+//                    }
+//                }
+//                //停餐开始日期>前段开餐开始日期
+//                if ($beginDate->gt($firstBeginDate)) {
+//                    if (is_null($endDate) && $beginDate->lte($firstEndDate)) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                        $bookSecond = BookBreakfast::where('id', $secondId)->delete();
+//                    }
+//                    if (is_null($endDate) && $beginDate->gt($firstEndDate)) {
+//                        $bookSecond = BookBreakfast::where('id', $secondId)->delete();
+//                    }
+//                    if (is_null($endDate) && $beginDate->gt($secondBeginDate)) {
+//                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                    }
+//                    //停餐结束日期不为空并且停餐开始日期<=前段开餐结束日期并且停餐结束日期<=前段开餐结束日期
+//                    if (!is_null($endDate) && $beginDate->lte($firstEndDate) && $endDate->lte($firstEndDate)) {
+//                        //目前暂这样处理不然会出现分段数据造成三个分段
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                    }
+//                    if (!is_null($endDate) && $beginDate->lte($firstEndDate) && $endDate->lt($secondBeginDate)) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                    }
+//                    if (!is_null($endDate) && $beginDate->gte($firstEndDate) && $endDate->lt($secondBeginDate)) {
+//                        $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                    }
+//                    //停餐结束日期不为空并且停餐开始日期<=前段开餐结束日期并且停餐结束日期>=后段开餐开始日期
+//                    if (!is_null($endDate) && $beginDate->lte($firstEndDate) && $endDate->gte($secondBeginDate)) {
+//                        if (is_null($secondEndDate) || ( !is_null($secondEndDate) && $endDate-lt($secondEndDate) )) {
+//                            $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
+//                        }
+//                        if (!is_null($secondEndDate) && $endDate->gte($secondEndDate)) {
+//                            $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                            $bookSecond = BookBreakfast::where('id', $secondId)->delete();
+//                        }
+//                    }
+//                    //停餐结束日期不为空并且停餐开始日期>=后段开餐开始日期
+//                    if (!is_null($endDate) && $beginDate->gte($secondBeginDate)) {
+//                        if (is_null($secondEndDate) && $beginDate->eq($secondBeginDate)) {
+//                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
+//                        }
+//                        if (is_null($secondEndDate) && $beginDate->gt($secondBeginDate)) {
+//                            //暂不作处理不然会产生三段数据
+//                            return redirect()->back()->with('status', '请在'.$firstEndDate.'之后再设置。');
+//                        }
+//                        if (!is_null($secondEndDate) && $beginDate->eq($secondBeginDate) && $endDate->gte($secondEndDate)) {
+//                            $bookSecond = BookBreakfast::where('id', $secondId)->delete();
+//                        }
+//                        if (!is_null($secondEndDate) && $beginDate->gt($secondBeginDate) && $beginDate->lt($secondEndDate) && $endDate->gte($secondEndDate)){
+//                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
+//                        }
+//                        if (!is_null($secondEndDate) && $beginDate->gt($secondBeginDate) && $endDate->lt($secondEndDate)){
+//                            //暂不作处理不然会产生三段数据
+//                            return redirect()->back()->with('status', '请在'.$firstEndDate.'之后再设置。');
 //                        }
 //                    }
 //                }
-//                //if ($beginDate->eq())
-//                //前段有效开餐记录的结束日期=停餐开始日期-1
-//                $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
 //            }
-//
-//            //开餐结束日期为空（长期）的有效记录处理
-//            if (!is_null($secondId)){
-//                //开餐结束日期不为空且有效的记录不存在时处理
-//                if (is_null($firstId)) {
-//                    if (!is_null($endDate)) {
-//                        //当停餐结束日期不为空时
-//                        $bookFirst = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
-//                        //增加后段有效开餐记录
-//                        $bookSecond = BookBreakfast::create([
-//                            'begin_date' => $endDate->copy()->addDay(),
-//                            'end_date' => null,
-//                            'user_id' => $user->id,
-//                        ]);
-//                    } else {
-//                        //停餐结束日期为空时开餐记录结束日期=停餐开始日期-1
-//                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
-//                    }
-//                } else {
-//                    if (!is_null($endDate)) {
-//                        //停餐结束日期不为空时开餐记录开始日期=停餐结束日期+1
-//                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
-//                    } else {
-//                        //当停餐结束日期为空（长期）时，删除长期开餐记录
-//                        BookBreakfast::where('id', $secondId)->delete();
-//                        //修改前段开餐记录结束日期=停餐开始日期-1
-//                        BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
-//                    }
-//                }
-//            }
+
+            //前段开餐有效记录处理
+            if (!is_null($firstId)){
+                //开餐结束日期为空的记录不存在时处理
+                if (is_null($secondId)){
+                    //当停餐开始日期大于有效开餐日期时直接返回
+                    if (!is_null($firstEndDate) && $beginDate->gt($firstEndDate)) {
+                        return redirect()->back()->with('status', '该时间段没有开餐无须停餐');
+                    } else {
+                        //当停餐结束日期小于开餐结束日期时插入开餐后段有效记录
+                        if (!is_null($endDate)) {
+                            if (!is_null($firstEndDate) && $endDate->lt($firstEndDate)) {
+                                $bookSecond = BookBreakfast::create([
+                                    'begin_date' => $endDate->copy()->addDay(),
+                                    'end_date' => $firstEndDate,
+                                    'user_id' => $user->id,
+                                ]);
+                            }
+                        }
+                    }
+                }
+                if ($beginDate->lte($firstBeginDate)) {
+                    BookBreakfast::where('id', $firstId)->delete();
+                } else {
+                    //前段有效开餐记录的结束日期=停餐开始日期-1
+                    if ((!is_null($firstEndDate) && $beginDate->lt($firstEndDate)) || is_null($firstEndDate))
+                    $bookFirst = BookBreakfast::where('id', $firstId)->update(['end_date' => $beginDate->copy()->subDay()]);
+                }
+            }
+
+            //后段开餐有效记录处理
+            if (!is_null($secondId)){
+                //开餐结束日期不为空且有效的记录不存在时处理
+                if (!is_null($secondEndDate) && $beginDate->gt($secondEndDate)) {
+                    return redirect()->back()->with('status', '该时间段没有开餐无须停餐');
+                }
+                if (!is_null($endDate)) {
+                    if (!is_null($secondEndDate) && $endDate->lt($secondEndDate)) {
+                        if ($beginDate->lte($secondBeginDate)) {
+                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['begin_date' => $endDate->copy()->addDay()]);
+                        } else {
+                            //当停餐结束日期不为空时
+                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
+                        }
+                    } else {
+                        if ($beginDate->lte($secondBeginDate)) {
+                            BookBreakfast::where('id', $secondId)->delete();
+                        } else {
+                            $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
+                        }
+                    }
+                } else {
+                    if ($beginDate->lte($secondBeginDate)) {
+                        BookBreakfast::where('id', $secondId)->delete();
+                    } else {
+                        //停餐结束日期为空时开餐记录结束日期=停餐开始日期-1
+                        $bookSecond = BookBreakfast::where('id', $secondId)->update(['end_date' => $beginDate->copy()->subDay()]);
+                    }
+                }
+            }
 
             if (isset($bookFirst) || isset($bookSecond)){
                 DB::commit();
