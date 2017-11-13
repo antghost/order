@@ -74,6 +74,11 @@ class HomeController extends Controller
 //        ]);
     }
 
+    public function report()
+    {
+        return view('staff.report.index');
+    }
+
     private function userOfDays($startDate, $endDate, $method = null)
     {
         if (strtolower($method) == 'breakfast') $meal = new BookBreakfast();

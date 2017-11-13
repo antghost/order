@@ -36,6 +36,9 @@ Route::group(['namespace' => 'User', 'prefix' => 'user', 'middleware' => 'auth']
 Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
     Route::get('/data', 'HomeController@getData');
+    //报表
+    Route::get('/report', 'HomeController@report');
+    Route::get('/report/data', 'HomeController@getReportData');
     //菜单
     Route::resource('/menu', 'MenuController');
     //定餐时限

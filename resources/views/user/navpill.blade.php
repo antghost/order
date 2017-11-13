@@ -10,6 +10,6 @@
         <li role="presentation" {{ $staff_price or '' }}><a href="{{ url('staff') }}">缴费设置</a></li>
         <li role="presentation" {{ $common_holiday or '' }}><a href="{{ url('common/calendar') }}">假期设置</a></li>
         <li role="presentation" {{ $common_notice or '' }}><a href="{{ url('staff') }}">发布通知</a></li>
-        <li role="presentation" {{ $common_report or '' }}><a href="{{ url('staff') }}">报表</a></li>
+        <li role="presentation" {{ $common_report or '' }}><a href="{{ url('staff/report') }}">报表</a></li>
     </ul>
 </div>
