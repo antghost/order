@@ -18,6 +18,11 @@ class HomeController extends Controller
 
     public function index()
     {
+        return view('staff.home');
+    }
+
+    public function getData()
+    {
         $today = Carbon::today();
         $tomorrow = Carbon::tomorrow();
 
@@ -46,20 +51,27 @@ class HomeController extends Controller
         $userOfMonthInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
         $userOfMonthInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
 
-        return view('staff.home', [
-            'userOfDayInBreakfasts' => $userOfDayInBreakfasts,
-            'userOfDayInLunches' => $userOfDayInLunches,
-            'userOfDayInDinners' => $userOfDayInDinners,
-            'userOfTomorrowInBreakfasts' => $userOfTomorrowInBreakfasts,
-            'userOfTomorrowInLunches' => $userOfTomorrowInLunches,
-            'userOfTomorrowInDinners' => $userOfTomorrowInDinners,
-            'userOfWeekInBreakfasts' => $userOfWeekInBreakfasts,
-            'userOfWeekInLunches' => $userOfWeekInLunches,
-            'userOfWeekInDinners' => $userOfWeekInDinners,
-            'userOfMonthInBreakfasts' => $userOfMonthInBreakfasts,
-            'userOfMonthInLunches' => $userOfMonthInLunches,
-            'userOfMonthInDinners' => $userOfMonthInDinners,
-        ]);
+        $data = [];
+        $data = [
+            'breakfasts' => [$userOfMonthInBreakfasts, $userOfWeekInBreakfasts, $userOfTomorrowInBreakfasts, $userOfDayInBreakfasts],
+            'lunches' => [$userOfMonthInLunches, $userOfWeekInLunches, $userOfTomorrowInLunches, $userOfDayInLunches],
+            'dinners' => [$userOfMonthInDinners, $userOfWeekInDinners, $userOfTomorrowInDinners, $userOfDayInDinners]
+            ];
+        return $data;
+//        return view('staff.home', [
+//            'userOfDayInBreakfasts' => $userOfDayInBreakfasts,
+//            'userOfDayInLunches' => $userOfDayInLunches,
+//            'userOfDayInDinners' => $userOfDayInDinners,
+//            'userOfTomorrowInBreakfasts' => $userOfTomorrowInBreakfasts,
+//            'userOfTomorrowInLunches' => $userOfTomorrowInLunches,
+//            'userOfTomorrowInDinners' => $userOfTomorrowInDinners,
+//            'userOfWeekInBreakfasts' => $userOfWeekInBreakfasts,
+//            'userOfWeekInLunches' => $userOfWeekInLunches,
+//            'userOfWeekInDinners' => $userOfWeekInDinners,
+//            'userOfMonthInBreakfasts' => $userOfMonthInBreakfasts,
+//            'userOfMonthInLunches' => $userOfMonthInLunches,
+//            'userOfMonthInDinners' => $userOfMonthInDinners,
+//        ]);
     }
 
     private function userOfDays($startDate, $endDate, $method = null)

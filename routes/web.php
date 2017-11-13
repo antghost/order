@@ -35,6 +35,7 @@ Route::group(['namespace' => 'User', 'prefix' => 'user', 'middleware' => 'auth']
 //食堂工作人员功能
 Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => 'auth'], function (){
     Route::get('/', 'HomeController@index');
+    Route::get('/data', 'HomeController@getData');
     //菜单
     Route::resource('/menu', 'MenuController');
     //定餐时限
