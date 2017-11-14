@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Staff;
 use App\Models\BookBreakfast;
 use App\Models\BookDinner;
 use App\Models\BookLunch;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -82,6 +83,37 @@ class HomeController extends Controller
     public function report()
     {
         return view('staff.report.index');
+    }
+
+    public function getReportData(Request $request)
+    {
+        $year = $request->input('year');
+        $data = [];
+        for ($i = 1; $i <= 12 ;$i++){
+            $dt = Carbon::create($year, $i);
+            $breakfast[] = $this->userOfDays($dt->startOfMonth(), $dt->endOfMonth(), 'breakfast');
+            $lunch[] = $this->userOfDays($dt->startOfMonth(), $dt->endOfMonth(), 'lunch');
+            $dinner[] = $this->userOfDays($dt->startOfMonth(), $dt->endOfMonth(), 'dinner');
+        }
+        $data['breakfasts'] = $breakfast;
+        $data['lunches'] = $lunch;
+        $data['dinners'] = $dinner;
+        return $data;
+    }
+
+    private function userOfPrices($startDate, $endDate, $method = null)
+    {
+        if (strtolower($method) == 'breakfast') $meal = new BookBreakfast();
+        if (strtolower($method) == 'lunch') $meal = new BookLunch();
+        if (strtolower($method) == 'dinner') $meal = new BookDinner();
+        
+        $users = User::all();
+        foreach ($users as $user){
+            $prices = $user->priceUsers()->get();
+            foreach ($prices as $price){
+
+            }
+        }
     }
 
     private function userOfDays($startDate, $endDate, $method = null)

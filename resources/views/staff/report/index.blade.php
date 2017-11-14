@@ -34,7 +34,7 @@
         //初始化echarts实例
         myChart = echarts.init(document.getElementById('echarts'));
         myChart.showLoading();
-        $.get("{{ url('staff/data') }}").done(function (data) {
+        $.get("{{ url('staff/report/data?year=2017') }}").done(function (data) {
         option = {
             tooltip : {
                 trigger: 'axis',
@@ -43,7 +43,7 @@
                 }
             },
             legend: {
-                data: ['早餐', '午餐','晚餐','总金额']
+                data: ['早餐人数', '午餐人数','晚餐人数','总金额']
             },
             grid: {
                 left: '3%',
@@ -81,7 +81,7 @@
             ],
             series: [
                 {
-                    name: '早餐',
+                    name: '早餐人数',
                     type: 'bar',
                     stack: '总人数',    //数据堆叠，同个类目轴上系列配置相同的stack值可以堆叠放置。
                     label: {
@@ -93,7 +93,7 @@
                     data: data.breakfasts
                 },
                 {
-                    name: '午餐',
+                    name: '午餐人数',
                     type: 'bar',
                     stack: '总人数',
                     label: {
@@ -105,7 +105,7 @@
                     data: data.lunches
                 },
                 {
-                    name: '晚餐',
+                    name: '晚餐人数',
                     type: 'bar',
                     stack: '总人数',
                     label: {
