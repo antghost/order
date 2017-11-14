@@ -53,7 +53,7 @@
             },
             toolbox: {
                 feature: {
-                    dataView: {show: true, readOnly: false},
+                    dataView: {show: true, readOnly: true},
                     restore: {show: true},
                     saveAsImage: {show: true}
                 }
@@ -65,9 +65,20 @@
                 },
                 data: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
             },
-            yAxis: {
+            yAxis: [{
                 type: 'value'
             },
+//                {
+//                type: 'value',
+//                name: '金额',
+//                min: 0,
+//                max: 1200,
+//                interval: 200,
+//                axisLabel: {
+//                    formatter: '{value}元'
+//                }
+//            }
+            ],
             series: [
                 {
                     name: '早餐',
@@ -105,12 +116,12 @@
                     },
                     data: data.dinners
                 },
-//                {
-//                    name: '总金额',
-//                    type: 'line',
-//                    yAxisIndex: 2,
-//                    data: [55.22, 33.2, 544.22, 663.33]
-//                }
+                {
+                    name: '总金额',
+                    type: 'line',
+//                    yAxisIndex: 1,
+                    data: [955.22, 933.2, 944.22, 863.33]
+                }
             ]
         };
         myChart.clear();

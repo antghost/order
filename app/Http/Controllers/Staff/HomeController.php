@@ -21,6 +21,11 @@ class HomeController extends Controller
         return view('staff.home');
     }
 
+    /**
+     * echarts柱状图所需要的数据
+     * @return array
+     *
+     */
     public function getData()
     {
         $today = Carbon::today();
@@ -90,7 +95,7 @@ class HomeController extends Controller
         $oneCount = $meal::where([
             ['begin_date', '>=', $startDate],
             ['end_date', '<=', $endDate],
-        ])->count();
+        ])->distinct('user_id')->count('user_id');
 
         //情况2：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为9月或之前，结束日期为10月或之后(理论上应该只有1条这样的数据)
         $twoCount = $meal::where('begin_date', '<', $startDate)
@@ -98,7 +103,7 @@ class HomeController extends Controller
                 $query->where('end_date', '>=', $startDate)
                     ->orWhereNull('end_date');
             })
-            ->count();
+            ->distinct('user_id')->count('user_id');
 
         //情况3：$startDate：10月1日，$endDate：10月31日，数据记录开始日期为10月，结束日期为11月或之后(理论上应该只有1条这样的数据)
         $threeCount = $meal::where([
@@ -108,7 +113,7 @@ class HomeController extends Controller
                 $query->where('end_date', '>', $endDate)
                     ->orWhereNull('end_date');
             })
-            ->count();
+            ->distinct('user_id')->count('user_id');
 
         return $userCount = $oneCount + $twoCount + $threeCount;
     }
