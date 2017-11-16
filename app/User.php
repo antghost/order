@@ -115,6 +115,11 @@ class User extends Authenticatable
      */
     public function CancelDinners()
     {
-        return $this->hasMany('App\Models\cancelDinner');
+        return $this->hasMany('App\Models\CancelDinner');
+    }
+
+    public function ReportData()
+    {
+        return $this->hasMany('App\Models\ReportData');
     }
 }

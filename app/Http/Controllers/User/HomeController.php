@@ -68,21 +68,31 @@ class HomeController extends Controller
 
         $user = Auth::user();
 
-        //早餐用餐天数
-        $breakfastDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast');
-        //早餐用餐总额
-        $breakfastAmount = $breakfastDays * $user->price->breakfast;
+        //首先从报表数据表中读取数据，数据为空时再从用餐记录表中统计
+        $data = $user->ReportData()->where('year', $year)->where('month', $month)->first();
+        if (isset($data)) {
+            $breakfastDays = $data->breakfasts;
+            $breakfastAmount = $data->breakfast_amount;
+            $lunchDays = $data->lunches;
+            $lunchAmount = $data->lunch_amount;
+            $dinnerDays = $data->dinners;
+            $dinnerAmount = $data->dinner_amount;
+        } else {
+            //早餐用餐天数
+            $breakfastDays = $this->bookOrCancelDays($startDate, $endDate, 'breakfast');
+            //早餐用餐总额
+            $breakfastAmount = $breakfastDays * $user->price->breakfast;
 
-        //午餐用餐天数
-        $lunchDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch');
-        //午餐用餐总额
-        $lunchAmount = $lunchDays * $user->price->lunch;
+            //午餐用餐天数
+            $lunchDays = $this->bookOrCancelDays($startDate, $endDate, 'lunch');
+            //午餐用餐总额
+            $lunchAmount = $lunchDays * $user->price->lunch;
 
-        //晚餐用餐天数
-        $dinnerDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner');
-        //晚餐用餐总额
-        $dinnerAmount = $dinnerDays * $user->price->breakfast;
-
+            //晚餐用餐天数
+            $dinnerDays = $this->bookOrCancelDays($startDate, $endDate, 'dinner');
+            //晚餐用餐总额
+            $dinnerAmount = $dinnerDays * $user->price->breakfast;
+        }
         $totalAmount = $breakfastAmount + $lunchAmount + $dinnerAmount;
 
         return view('user.home', [

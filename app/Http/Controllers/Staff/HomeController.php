@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Staff;
 use App\Models\BookBreakfast;
 use App\Models\BookDinner;
 use App\Models\BookLunch;
+use App\Models\ReportData;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -89,31 +91,36 @@ class HomeController extends Controller
     {
         $year = $request->input('year');
         $data = [];
-        for ($i = 1; $i <= 12 ;$i++){
-            $dt = Carbon::create($year, $i);
-            $breakfast[] = $this->userOfDays($dt->startOfMonth(), $dt->endOfMonth(), 'breakfast');
-            $lunch[] = $this->userOfDays($dt->startOfMonth(), $dt->endOfMonth(), 'lunch');
-            $dinner[] = $this->userOfDays($dt->startOfMonth(), $dt->endOfMonth(), 'dinner');
+
+        $reportDatas = ReportData::select('month',
+            DB::raw('sum(case when breakfasts>0 then 1 else 0 end) as breakfast_users,
+            sum(case when lunches>0 then 1 else 0 end) as lunch_users,
+            sum(case when dinners>0 then 1 else 0 end) as dinner_users,
+            sum(breakfasts) as breakfasts,sum(lunches) as lunches,sum(dinners) as dinners,
+            sum(breakfast_amount) as breakfast_amount,sum(lunch_amount) as lunch_amount,sum(dinner_amount) as dinner_amount'))
+            ->where('year', $year) //->where('breakfasts', '>', 0)
+            ->groupBy('month')->orderBy('month')->get();
+        foreach ($reportDatas as $reportData) {
+            $breakfastUsers[] = $reportData->breakfast_users;
+            $lunchUsers[] = $reportData->lunch_users;
+            $dinnerUsers[] = $reportData->dinner_users;
+            $breakfasts[] = $reportData->breakfasts;
+            $lunches[] = $reportData->lunches;
+            $dinners[] = $reportData->dinners;
+            $breakfastAmount[] = $reportData->breakfast_amount;
+            $lunchAmount[] = $reportData->lunch_amount;
+            $dinnerAmount[] = $reportData->dinner_amount;
         }
-        $data['breakfasts'] = $breakfast;
-        $data['lunches'] = $lunch;
-        $data['dinners'] = $dinner;
+        $data['breakfast_users'] = $breakfastUsers;
+        $data['lunch_users'] = $lunchUsers;
+        $data['dinner_users'] = $dinnerUsers;
+        $data['breakfasts'] = $breakfasts;
+        $data['lunches'] = $lunches;
+        $data['dinners'] = $dinners;
+        $data['breakfast_amount'] = $breakfastAmount;
+        $data['lunch_amount'] = $lunchAmount;
+        $data['dinner_amount'] = $dinnerAmount;
         return $data;
-    }
-
-    private function userOfPrices($startDate, $endDate, $method = null)
-    {
-        if (strtolower($method) == 'breakfast') $meal = new BookBreakfast();
-        if (strtolower($method) == 'lunch') $meal = new BookLunch();
-        if (strtolower($method) == 'dinner') $meal = new BookDinner();
-        
-        $users = User::all();
-        foreach ($users as $user){
-            $prices = $user->priceUsers()->get();
-            foreach ($prices as $price){
-
-            }
-        }
     }
 
     private function userOfDays($startDate, $endDate, $method = null)
