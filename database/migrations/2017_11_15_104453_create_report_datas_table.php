@@ -15,8 +15,8 @@ class CreateReportDatasTable extends Migration
     {
         Schema::create('report_datas', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
-            $table->unsignedSmallInteger('year');
+            $table->unsignedInteger('user_id')->index();
+            $table->unsignedSmallInteger('year')->index();
             $table->unsignedSmallInteger('month');
             $table->unsignedSmallInteger('breakfasts')->comment('早餐天数');
             $table->unsignedSmallInteger('lunches')->comment('午餐天数');

@@ -9,6 +9,6 @@
         <li role="presentation" {{ $bbs or '' }}><a href="{{ url('admin/bbs') }}">论坛管理</a></li>
         <li role="presentation" {{ $holiday or '' }}><a href="{{ url('admin') }}">假期设置</a></li>
         <li role="presentation" {{ $notice or '' }}><a href="{{ url('admin') }}">发布通知</a></li>
-        <li role="presentation" {{ $report or '' }}><a href="{{ url('admin') }}">报表</a></li>
+        <li role="presentation" {{ $report or '' }}><a href="{{ url('admin/report') }}">报表管理</a></li>
     </ul>
 </div>
