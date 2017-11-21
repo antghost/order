@@ -63,6 +63,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => 'auth
     Route::get('/user/search', 'UserController@search');
     Route::resource('/user', 'UserController');
     Route::resource('/fee', 'FeeController');
+    //权限管理
+    Route::resource('/role', 'RoleController');
     //报表
     Route::get('/report', 'ReportController@index');
     Route::post('/report/setData', 'ReportController@setData');
