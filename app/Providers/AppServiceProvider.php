@@ -16,10 +16,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //监控程序执行的每一条 SQL 语句
-        DB::listen(function ($query){
-            Log::info($query->sql);
-            Log::info($query->bindings);
-        });
+        if (config('app.debug')) {
+            DB::listen(function ($query) {
+                Log::info($query->sql);
+                Log::info($query->bindings);
+            });
+        }
     }
 
     /**

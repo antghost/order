@@ -23,9 +23,9 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $name = $request->input('name');
-//        Permission::create(['name' => $name]);
-        $user = User::find(13);
-        $user->syncPermissions(['admin', 'manger']);
+        Permission::create(['name' => $name]);
+//        $user = User::find(32);
+//        $user->syncPermissions(['admin', 'manger']);
         return redirect('admin/permit');
     }
 
