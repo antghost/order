@@ -33,7 +33,7 @@ Route::group(['namespace' => 'User', 'prefix' => 'user', 'middleware' => 'auth']
 });
 
 //食堂工作人员功能
-Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => ['permission:admin|manger']], function (){
+Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => ['permission:系统管理员|餐厅管理员']], function (){
     Route::get('/', 'HomeController@index');
     Route::get('/data', 'HomeController@getData');
     //报表
@@ -53,7 +53,7 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => ['per
 });
 
 //管理员功能
-Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['permission:admin']], function (){
+Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['permission:系统管理员']], function (){
     Route::get('/', 'HomeController@index');
     Route::resource('/dept', 'DeptController');
     //个人餐费标准历史

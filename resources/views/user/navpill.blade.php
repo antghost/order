@@ -3,7 +3,7 @@
         <li role="presentation" {{ $index or '' }}><a href="{{ url('user') }}">概况</a></li>
         <li role="presentation" {{ $breakfast or '' }}><a href="{{ url('user/breakfast/create') }}">用餐设置</a></li>
         <li role="presentation" {{ $info or '' }}><a href="{{ url('user/breakfast') }}">用餐详情</a></li>
-        @if(auth()->user()->can('管理员') || auth()->user()->can('manage'))
+        @if(auth()->user()->can('系统管理员') || auth()->user()->can('餐厅管理员'))
             <li role="presentation" {{ $staff_index or '' }}><a href="{{ url('staff') }}">用餐情况</a></li>
             <li role="presentation" {{ $staff_menus or '' }}><a href="{{ url('staff/menu') }}">菜式设置</a></li>
             <li role="presentation" {{ $staff_limit or '' }}><a href="{{ url('staff/limit') }}">时限设置</a></li>

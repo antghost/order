@@ -27,14 +27,14 @@
                             <div class="col-md-12">
                                 <form action="{{ url('') }}" class="navbar-form navbar-left" role="search">
                                     <div class="form-group">
-                                        <label for="dept">部门</label>
+                                        <label for="name">角色</label>
+                                        <input type="text" id="name" name="name" class="form-control" value="{{old('name')}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dept">权限</label>
                                         <select name="dept" id="dept" class="form-control">
                                             <option value=""></option>
                                         </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="name">姓名</label>
-                                        <input type="text" id="name" name="name" class="form-control" value="{{old('name')}}">
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">搜索</button>
@@ -46,15 +46,32 @@
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <th>姓名</th>
-                                    <th>用户名</th>
-                                    <th>所属部门</th>
-                                    <th>餐费标准</th>
+                                    <th>角色</th>
+                                    <th>权限</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-
+                                @if(count($roles) > 0)
+                                    @foreach($roles as $role)
+                                        <tr>
+                                            <td>{{ $role->name }}</td>
+                                            <td>
+                                                @foreach($role->permissions as $permission)
+                                                    {{ $permission->name }};
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                <a href="{{ url('admin/role/'.$role->id.'/edit') }}" class="btn btn-info">编辑</a>
+                                                <form action="{{ url('admin/role/'.$role->id) }}" method="post" style="display: inline">
+                                                    {{ csrf_field() }}
+                                                    {{method_field('DELETE')}}
+                                                    <button type="button" onclick="__del(this)" class="btn btn-danger">删除</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                                 </tbody>
                             </table>
 

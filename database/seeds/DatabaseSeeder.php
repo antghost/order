@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
 //        $this->call(PriceUserSeeder::class);
 //        $this->call(UserOrderStatusesSeeder::class);
 //        $this->call(BookMealSeeder::class);
-        $this->call(ReportDataSeeder::class);
+//        $this->call(ReportDataSeeder::class);
+        $this->call(PermissionSeeder::class);
     }
 }

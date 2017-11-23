@@ -44,7 +44,7 @@
                                 <a href="{{ url('/') }}">论坛</a>
                             </li>
                             <li><a href="{{ url('/user') }}">用户</a></li>
-                            @can('admin')
+                            @can('系统管理员')
                                 <li><a href="{{ url('/admin') }}">管理员</a></li>
                             @endcan
                         @endif

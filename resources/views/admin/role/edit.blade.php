@@ -13,7 +13,8 @@
             <div class="col-md-9">
                 <ul class="nav nav-tabs">
                     <li role="presentation" ><a href="{{ url('admin/role') }}">列表</a></li>
-                    <li role="presentation" class="active"><a href="{{ url('admin/role/create') }}">新增</a></li>
+                    <li role="presentation" ><a href="{{ url('admin/role/create') }}">新增</a></li>
+                    <li role="presentation" class="active"><a href="">编辑</a></li>
                 </ul>
             </div>
             <div class="col-md-9 col-md-offset-0">
@@ -28,12 +29,13 @@
                         @endif
 
                         <div class="col-md-12">
-                            <form class="form-horizontal" action="{{ url('admin/role') }}" method="post">
+                            <form class="form-horizontal" action="{{ url('admin/role/'.$role->id) }}" method="post">
                                 {{ csrf_field() }}
+                                {{ method_field('PUT') }}
                                 <div class="form-group {{ $errors->has('username') ? 'has-error' : '' }}">
                                     <label class="control-label col-md-2">角色</label>
                                     <div class="col-md-5">
-                                        <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
+                                        <input type="text" name="name" class="form-control" required value="{{ $role->name }}">
                                     </div>
                                     @if($errors->has('username'))
                                         <span class="help-block">
@@ -46,7 +48,17 @@
                                     <div class="col-md-5">
                                         <select name="permissions[]" class="form-control" multiple="multiple">
                                             @foreach($permissions as $permission)
-                                                <option>{{ $permission->name }}</option>
+                                                @if(count($role->permissions)> 0)
+                                                    <option
+                                                        @foreach($role->permissions as $role_permission)
+                                                            @if($role_permission->name == $permission->name)
+                                                                selected
+                                                            @endif
+                                                        @endforeach
+                                                    >{{ $permission->name }}</option>
+                                                @else
+                                                    <option>{{ $permission->name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
