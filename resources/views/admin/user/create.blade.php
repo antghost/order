@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('css')
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
+@endsection
 @section('content')
     <div class="container">
         <div class="row">
@@ -75,6 +78,16 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label class="control-label col-md-2">角色</label>
+                                    <div class="col-md-5">
+                                        <select id="role" name="roles[]" class="form-control" multiple="multiple">
+                                            @foreach($roles as $role)
+                                                <option>{{ $role->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label class="control-label col-md-2">餐费标准</label>
                                     <div class="col-md-5">
                                         <select name="price" class="form-control">
@@ -129,4 +142,14 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script src="{{ asset('js/select2.min.js') }}"></script>
+    <script>
+        $("#role").select2();
+        $('form').submit(function () {
+            $('button:submit').prop('disabled', true).text('正在提交');
+        });
+    </script>
 @endsection

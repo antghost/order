@@ -70,5 +70,8 @@
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
         $('select').select2();
+        $('form').submit(function () {
+            $("button:submit").prop('disabled', true).text('提交中');
+        });
     </script>
 @endsection

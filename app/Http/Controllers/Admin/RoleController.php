@@ -49,4 +49,10 @@ class RoleController extends Controller
         $role->syncPermissions($permissions);
         return redirect()->back()->with('status', '处理完成。');
     }
+
+    public function destroy($id)
+    {
+        Role::destroy($id);
+        return redirect()->back()->with('status', '处理完成。');
+    }
 }

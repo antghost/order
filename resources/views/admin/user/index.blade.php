@@ -50,13 +50,14 @@
                             </div>
 
                         <div class="col-md-12">
-                            <table class="table table-hover">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
                                     <th>姓名</th>
                                     <th>用户名</th>
                                     <th>所属部门</th>
                                     <th>餐费标准</th>
+                                    <th>角色</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -68,6 +69,11 @@
                                     <td>{{ $user->dept->name or '' }}</td>
                                     <td>早餐：{{$user->price->breakfast or ''}} 午餐：{{$user->price->lunch or ''}} 晚餐：{{$user->price->dinner or ''}}
                                         <a href="{{ url('admin/user/price/'.$user->id.'/edit') }}" class="btn btn-default">更改</a>
+                                    </td>
+                                    <td>
+                                        @foreach($user->roles as $role)
+                                            {{ $role->name }} ;
+                                            @endforeach
                                     </td>
                                     <td>
                                         <a href="{{ url('admin/user/'.$user->id.'/edit') }}" class="btn btn-info">编辑</a>

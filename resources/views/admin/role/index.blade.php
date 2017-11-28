@@ -25,7 +25,7 @@
                         @endif
 
                             <div class="col-md-12">
-                                <form action="{{ url('') }}" class="navbar-form navbar-left" role="search">
+                                <form action="{{ url('admin/role') }}" class="navbar-form navbar-left" role="search">
                                     <div class="form-group">
                                         <label for="name">角色</label>
                                         <input type="text" id="name" name="name" class="form-control" value="{{old('name')}}">

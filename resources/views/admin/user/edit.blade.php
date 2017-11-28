@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('css')
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
+@endsection
 @section('content')
     <div class="container">
         <div class="row">
@@ -70,7 +73,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2">所属部门</label>
                                     <div class="col-md-5">
-                                        <select name="dept" class="form-control">
+                                        <select id="dept" name="dept" class="form-control">
                                             @foreach($depts as $dept)
                                                 @if ($user->dept == '')
                                                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -79,6 +82,22 @@
                                                 @else
                                                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                                                 @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">角色</label>
+                                    <div class="col-md-5">
+                                        <select id="role" name="roles[]" class="form-control" multiple="multiple">
+                                            @foreach($roles as $role)
+                                                <option
+                                                     @foreach($user->roles as $user_role)
+                                                        @if($user_role->name == $role->name)
+                                                        selected
+                                                        @endif
+                                                     @endforeach
+                                                >{{ $role->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -127,7 +146,9 @@
 @endsection
 
 @section('script')
+    <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
+        $("#role").select2();
         $('form').submit(function () {
             $('button:submit').prop('disabled', true).text('正在提交');
         });

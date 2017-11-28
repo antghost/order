@@ -40,12 +40,12 @@
                     <ul class="nav navbar-nav">
                         &nbsp;
                         @if(Auth::check())
-                            <li>
-                                <a href="{{ url('/') }}">论坛</a>
-                            </li>
-                            <li><a href="{{ url('/user') }}">用户</a></li>
+                            {{--<li>--}}
+                                {{--<a href="{{ url('/') }}">论坛</a>--}}
+                            {{--</li>--}}
+                            <li><a href="{{ url('/user') }}">个人设置</a></li>
                             @can('系统管理员')
-                                <li><a href="{{ url('/admin') }}">管理员</a></li>
+                                <li><a href="{{ url('/admin') }}">系统管理</a></li>
                             @endcan
                         @endif
                     </ul>
@@ -54,8 +54,8 @@
                     <ul class="nav navbar-nav navbar-right">
                         <!-- Authentication Links -->
                         @if (Auth::guest())
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
+                            <li><a href="{{ route('login') }}">登录</a></li>
+                            {{--<li><a href="{{ route('register') }}">Register</a></li>--}}
                         @else
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -74,7 +74,7 @@
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                            Logout
+                                            退出
                                         </a>
 
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

@@ -11,6 +11,7 @@ use App\User;
 use App\Models\Dept;
 use App\Models\Price;
 use App\Models\PriceUser;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -27,7 +28,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.user.create', ['depts' => Dept::all(), 'prices' => Price::all()]);
+        return view('admin.user.create', [
+            'depts' => Dept::all(),
+            'prices' => Price::all(),
+            'roles' => Role::all(),
+            ]);
     }
 
     /**
@@ -50,7 +55,7 @@ class UserController extends Controller
     {
         //闪存数据
         $request->flashExcept('password');
-
+        $roles = $request->input('roles') ? $request->input('roles') : [];
         $this->validator($request->input())->validate();
 
         //需要增加事务，确保用户与对应的标准同时添加成功
@@ -68,6 +73,8 @@ class UserController extends Controller
         ]);
 
         if(isset($user)){
+            //权限角色
+            $user->assignRole($roles);
             //对应收费标准数据
             $price = Price::findOrFail($request->input('price'));
             $breakfast = $price->breakfast;
@@ -102,7 +109,11 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        return view('admin.user.edit', ['user' => User::find($id), 'depts' => Dept::all()]);
+        return view('admin.user.edit', [
+            'user' => User::find($id),
+            'depts' => Dept::all(),
+            'roles' => Role::all(),
+        ]);
     }
 
     /**
@@ -118,6 +129,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $id . '|max:255',
         ]);
 
+        $roles = $request->input('roles') ? $request->input('roles') : [];
         $user = User::findOrFail($id);
         $user->username = $request->input('username');
         $user->name = $request->input('name');
@@ -130,6 +142,7 @@ class UserController extends Controller
         }
 
         if($user->save()){
+            $user->syncRoles($roles);
             return redirect()->back()->with('status', '更新成功！');
         } else {
             return redirect()->back()->withInput()->withErrors('更新失败', 'msg');
