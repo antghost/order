@@ -37,13 +37,13 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'string|required|max:100',
-            'type' => 'required|max:1',
-        ]);
-
         $name = $request->input('name');
         $type = $request->input('type');
+
+        $this->validate($request, [
+            'name' => 'string|required|unique:menus,name,'.$type.'|max:100',
+            'type' => 'required|max:1',
+        ]);
 
         $menu = Menu::create([
             'name' => $name,

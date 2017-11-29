@@ -75,7 +75,7 @@
                         <tbody>
                         @foreach( $menus as $menu)
                             <tr>
-                                <td>{{ $menu->name or '' }}</td>
+                                <td>{{ $menu->name or '' }}<span class="badge">今日菜单</span></td>
                                 <td>{{ $menu->type or '' }}</td>
                                 <td>
                                     <input type="button" class="btn btn-info" name="editBtn" value="编辑">
