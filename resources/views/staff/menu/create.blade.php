@@ -1,12 +1,22 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="{{ app()->getLocale() }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-@section('content')
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Meal-System') }}</title>
+
+    <!-- Styles -->
+    {{--    <link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
+    <link href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body style="background-color:whitesmoke">
     <div class="container">
         <div class="row">
-            @component('user.navpill',['staff_menus' => 'class=active'])
-
-            @endcomponent
-
             <div class="col-md-9 col-md-offset-0">
                 <div class="panel">
                     <div class="col-md-12">
@@ -28,7 +38,7 @@
 
                     <div class="panel-body">
                         <div class="col-md-12">
-                            <form class="form-horizontal" action="" method="post">
+                            <form class="form-horizontal" action="{{ url('staff/menu') }}" method="post">
                                 {{ csrf_field() }}
                                 <div class="form-group">
                                     <label class="control-label col-md-2">名称</label>
@@ -54,8 +64,19 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label class="control-label col-md-2">今日菜单</label>
+                                    <div class="radio col-md-5">
+                                        <label>
+                                            <input type="radio" name="active" value="1">是
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="active" value="0" checked>否
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="col-md-offset-2 col-md-2">
-                                        <input type="submit" class="form-control btn btn-info" value="添加">
+                                        <input id="submit" type="button" class="form-control btn btn-info" value="添加">
                                     </div>
                                 </div>
                             </form>
@@ -63,32 +84,27 @@
                     </div>
                 </div>
 
-                <div class="col-md-12" style="background-color: white; margin-top: 10px">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>名称</th>
-                            <th>类型</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach( $menus as $menu)
-                            <tr>
-                                <td>{{ $menu->name or '' }}</td>
-                                <td>{{ $menu->type or '' }}</td>
-                                <td>
-                                    <input type="button" class="btn btn-info" name="editBtn" value="编辑">
-                                    <input type="button" class="btn btn-danger" name="deleteBtn" value="删除">
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-
-
-                </div>
             </div>
         </div>
     </div>
-@endsection
+
+    <!-- javascript -->
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('layer/layer.js') }}"></script>
+<script>
+    //ajax全局设置
+    $.ajaxSetup({
+        headers: {
+            //设置csrf防止ajax call返回internal 500错误
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
+        }
+    });
+    $('#submit').on('click', function () {
+        console.log($('form').action);
+        $.post($('form').action, function (data) {
+            layer.msg(data);
+        });
+    });
+</script>
+</body>
+</html>

@@ -31,7 +31,7 @@
                             <form id="form_search" class="navbar-form navbar-left" action="{{ route('menu.search') }}" method="get" role="search">
                                 <div class="form-group">
                                     <label class="control-label">名称</label>
-                                    <input name="name" type="text" class="form-control" value="{{ old('name') }}">
+                                    <input id="input_name" name="name" type="text" class="form-control" value="{{ old('name') }}">
                                 </div>
                                 <div class="form-group">
                                     <input type="checkbox" id="breakfast" name="breakfast">
@@ -54,8 +54,10 @@
                 </div>
 
                 <div id="div_table" class="col-md-12" style="background-color: white; margin-top: 1px">
-                    <button type="button" name="btn_menu_add" class="btn btn-primary">添加菜式</button>
-                    <form id="form_menu" action="" method="post"></form>
+                    <a href="{{ url('staff/menu/create') }}" class="btn btn-primary menu_add">添加菜式</a>
+                    <form id="form_menu" action="" method="post">
+                        {{ csrf_field() }}
+                    </form>
                     <table class="table">
                         <thead>
                         <tr>
@@ -70,10 +72,12 @@
                         @foreach( $menus as $menu)
                             <tr id="table{{ $menu->id }}">
                                 <td><input type="checkbox" id="{{ $menu->id }}" name="ids[]" class="checkbox" value="{{ $menu->id }}"></td>
-                                <td><label for="{{ $menu->id }}"> {{ $menu->name or '' }}
+                                <td><div id="div_show">
+                                        <label for="{{ $menu->id }}"> {{ $menu->name or '' }} </label>
                                         @if($menu->active)
-                                            </label><span class="badge">今日菜单</span>
+                                            <span class="badge">今日菜单</span>
                                         @endif
+                                    </div>
                                 </td>
                                 <td>{{ $menu->type or '' }}</td>
                                 <td>
@@ -103,10 +107,12 @@
 @section('script')
     <script src="{{ asset('layer/layer.js') }}"></script>
     <script>
+        var url = "{{ url('staff/menu/today/') }}";
         //ajax全局设置
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                //设置csrf防止ajax call返回internal 500错误
+                'X-CSRF-TOKEN': $('#form_menu input[name="_token"]').val()
             }
         });
         //全选
@@ -122,7 +128,52 @@
         });
 
         //逐条今日菜单设置
+        //将事件绑定到parent的.on()函数，解决无法点击触发事件的问题
+        $('#div_table').on('click', 'button[name="menu_today"]', function () {
+            var id = $(this).val();
+            $.post(url+ "/"+ id, function (data) {
+                console.log(data.name);
+
+            });
+        });
 
         //批量今日菜单设置
+
+        //删除
+        $('#div_table').on('click', 'button[name="menu_delete"]', function () {
+            layer.confirm('确认删除？',function (index) {
+                var id = $(this).val();
+                $.ajax({
+                    method: 'DELETE',
+                    url: url+ "/"+ id + 'delete',
+                    success: function (data) {
+                        layer.msg(data);
+                    }
+                });
+                layer.close(index);
+                layer.load(1);
+            });
+        });
+
+        //新增菜单
+        $('.menu_add').on('click', function () {
+            var _href = $(this).attr('href');
+            layer.open({
+                type: 2,
+                //skin: 'layui-layer-lan',
+                title: '新增菜式',
+                //skin: 'layui-layer-rim', //加上边框
+                area: ['400px', '500px'], //宽高
+                content: _href,
+                success: function(layero, index){
+                },
+                end: function(){
+                    history.go(0);
+                },
+
+            });
+
+            return false;
+        });
     </script>
 @endsection

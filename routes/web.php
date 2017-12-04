@@ -40,7 +40,7 @@ Route::group(['namespace' => 'Staff', 'prefix' => 'staff', 'middleware' => ['per
     Route::get('/report', 'HomeController@report');
     Route::get('/report/data', 'HomeController@getReportData');
     //菜单
-    Route::post('/menu/today', 'MenuController@todayMenu');
+    Route::post('/menu/today/{id}', 'MenuController@todayMenu');
     Route::post('/menu/mass_today', 'MenuController@massTodayMenu');
     //搜索功能，search顺序要放在@show之前
     Route::get('/menu/s', 'MenuController@s')->name('menu.search');

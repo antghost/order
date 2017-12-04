@@ -26,7 +26,7 @@ class MenuController extends Controller
      */
     public function create()
     {
-        //
+        return view('staff.menu.create');
     }
 
     /**
@@ -44,13 +44,15 @@ class MenuController extends Controller
 
         $name = $request->input('name');
         $type = $request->input('type');
+        $active = $request->input('active');
 
         $menu = Menu::create([
             'name' => $name,
-            'type' => $type
+            'type' => $type,
+            'active' => $active,
         ]);
 
-        return redirect()->back();
+        return response()->json(['添加完成']);
     }
 
     /**
@@ -84,7 +86,11 @@ class MenuController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+        $menu->name = $request->input('name');
+        $menu->type = $request->input('type');
+        $menu->save();
+        return response()->json(['添加成功']);
     }
 
     /**
@@ -95,7 +101,8 @@ class MenuController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Menu::destroy($id);
+        return response()->json(['删除成功']);
     }
 
     public function s(Request $request)
@@ -136,10 +143,18 @@ class MenuController extends Controller
 
     public function todayMenu($id)
     {
+        $data = [];
         $menu = Menu::findOrFail($id);
-        $menu->active ? $menu->active = 0 : $menu->active = 1;
+//        $menu->active ? $menu->active = 0 : $menu->active = 1;
+        if ($menu->active) {
+            $menu->active = 0 ;
+            $data['name'] = '添加';
+        } else {
+            $menu->active = 1 ;
+            $data['name'] = '取消';
+        }
         $menu->save();
-        return redirect()->back();
+        return response()->json($data);
     }
 
     public function massTodayMenu(Request $request)
