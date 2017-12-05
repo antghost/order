@@ -12,6 +12,7 @@
 */
 
 Route::get('/', 'IndexController@index');
+Route::get('/getMenu', 'IndexController@getMenu');
 
 Auth::routes();
 

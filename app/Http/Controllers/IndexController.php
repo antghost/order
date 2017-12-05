@@ -3,11 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\Menu;
 
 class IndexController extends Controller
 {
     public function index()
     {
-        return view('index');
+        $today = Carbon::today();
+        //当天用餐人数
+        $userInBreakfasts = $this->userOfDays($today, $today, 'breakfast');
+        $userInLunches = $this->userOfDays($today, $today, 'lunch');
+        $userInDinners = $this->userOfDays($today, $today, 'dinner');
+        $breakfastMenus = Menu::where('type', 1)->where('active', 1)->get();
+        $lunchMenus = Menu::where('type', 2)->where('active', 1)->get();
+        $dinnerMenus = Menu::where('type', 3)->where('active', 1)->get();
+        return view('index',
+            compact('userInBreakfasts', 'userInLunches', 'userInDinners', 'breakfastMenus', 'lunchMenus', 'dinnerMenus')
+        );
     }
+
+    public function getMenu()
+    {}
 }

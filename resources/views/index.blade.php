@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-md-8" style="background-color:white; height: 100px">
                     <h5>早餐人数</h5>
-                    <h1>123</h1>
+                    <h1>{{ $userInBreakfasts }}</h1>
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                 </div>
                 <div class="col-md-8" style="background-color:white;height: 100px">
                     <h5>午餐人数</h5>
-                    <h1>123</h1>
+                    <h1>{{ $userInLunches }}</h1>
                 </div>
             </div>
 
@@ -99,8 +99,8 @@
                     </div>
                 </div>
                 <div class="col-md-8" style="background-color:white;height: 100px">
-                    <h5>午餐人数</h5>
-                    <h1>123</h1>
+                    <h5>晚餐人数</h5>
+                    <h1>{{ $userInDinners }}</h1>
                 </div>
             </div>
 
@@ -113,7 +113,11 @@
                     </div>
                 </div>
                 <div class="col-md-10" style="background-color:white;height: 110px">
-                    <h5>菜名</h5>
+                    <h3>
+                        @foreach($breakfastMenus as $breakfastMenu)
+                            {{ $breakfastMenu->name }} ;
+                        @endforeach
+                    </h3>
                 </div>
             </div>
 
@@ -125,7 +129,11 @@
                     </div>
                 </div>
                 <div class="col-md-10" style="background-color:white;height: 110px">
-                    <h5>菜名</h5>
+                    <h3>
+                        @foreach($lunchMenus as $lunchMenu)
+                            {{ $lunchMenu->name }} ;
+                        @endforeach
+                    </h3>
                 </div>
             </div>
 
@@ -137,7 +145,11 @@
                     </div>
                 </div>
                 <div class="col-md-10" style="background-color:white;height: 110px">
-                    <h5>菜名</h5>
+                    <h3>
+                        @foreach($dinnerMenus as $dinnerMenu)
+                            {{ $dinnerMenu->name }} ;
+                        @endforeach
+                    </h3>
                 </div>
             </div>
         </div>
@@ -160,6 +172,9 @@
 
 <!-- javascript -->
 <script src="{{ asset('js/app.js') }}"></script>
-
+<script>
+    {{--$.get("{{ url('/getMenu') }}").done(function (data) {--}}
+    {{--});--}}
+</script>
 </body>
 </html>
