@@ -69,7 +69,7 @@
         <div class="col-md-9 col-md-offset-0">
             {{--左侧栏第一行人数显示--}}
             <div class="col-md-4">
-                <div class="col-md-4" style="background-color: lightblue;height: 100px">
+                <div class="col-md-4" style="background-color: skyblue;height: 100px">
                     <div class="text-center">
                         <h1><span class="glyphicon glyphicon-hand-right"></span></h1>
                     </div>
@@ -81,7 +81,7 @@
             </div>
 
             <div class="col-md-4">
-                <div class="col-md-4" style="background-color: lightblue;height: 100px">
+                <div class="col-md-4" style="background-color:skyblue;height: 100px">
                     <div class="text-center">
                         <h1><span class="glyphicon glyphicon-hand-right"></span></h1>
                     </div>
@@ -93,7 +93,7 @@
             </div>
 
             <div class="col-md-4">
-                <div class="col-md-4" style="background-color: lightblue;height: 100px">
+                <div class="col-md-4" style="background-color: skyblue;height: 100px">
                     <div class="text-center">
                         <h1><span class="glyphicon glyphicon-hand-right"></span></h1>
                     </div>
@@ -155,16 +155,15 @@
         </div>
 
         {{--右侧通知栏--}}
-        <div class="col-md-3 col-md-offset-0" style="background-color: white">
-            <h3>通知:</h3>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
-            <p>sdfsfdfs</p>
+        <div id="notice" class="col-md-3 col-md-offset-0" style="background-color: white">
+            <h1 class="page-header">通知</h1>
+            @foreach($notices as $notice)
+                <div>
+                    <li><h4 class="text-primary"><a href="">{{ $notice->title }}</a></h4></li>
+                    <div><p style="text-indent:2em">{{ str_limit($notice->content,200) }}<a href="">查看</a></p></div>
+                    <line></line>
+                </div>
+            @endforeach
         </div>
 
     </div>

@@ -79,4 +79,6 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['per
 
 Route::group(['namespace' => 'Common', 'prefix' => 'common', 'middleware' => ['permission:系统管理员|餐厅管理员']], function (){
     Route::resource('/calendar', 'CalendarController');
+    Route::resource('/notice', 'NoticeController');
+
 });
