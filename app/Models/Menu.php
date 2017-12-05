@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Menu extends Model
 {
     protected $fillable = ['name', 'type', 'active'];
+
+    protected $casts = [ 'active' => 'boolean'];
+
     public function getTypeAttribute($value)
     {
         switch ($value){
@@ -29,3 +32,4 @@ class Menu extends Model
         return $chn;
     }
 }
+

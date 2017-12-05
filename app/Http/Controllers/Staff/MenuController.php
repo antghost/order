@@ -16,7 +16,7 @@ class MenuController extends Controller
     public function index()
     {
 
-        return view('staff.menu.index', ['menus' => Menu::all()]);
+        return view('staff.menu.index', ['menus' => Menu::paginate(10)]);
     }
 
     /**
@@ -26,7 +26,7 @@ class MenuController extends Controller
      */
     public function create()
     {
-        //
+        return view('staff.menu.create');
     }
 
     /**
@@ -39,7 +39,7 @@ class MenuController extends Controller
     {
         $name = $request->input('name');
         $type = $request->input('type');
-
+        $active = $request->input('active');
         $this->validate($request, [
             'name' => 'string|required|unique:menus,name,'.$type.'|max:100',
             'type' => 'required|max:1',
@@ -47,10 +47,12 @@ class MenuController extends Controller
 
         $menu = Menu::create([
             'name' => $name,
-            'type' => $type
+            'type' => $type,
+            'active' => $active,
         ]);
 
-        return redirect()->back();
+//        return response()->json(['添加完成']);
+        return redirect()->back()->with('status', '添加完成');
     }
 
     /**
@@ -72,7 +74,8 @@ class MenuController extends Controller
      */
     public function edit($id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+        return view('staff.menu.edit', compact('menu'));
     }
 
     /**
@@ -84,7 +87,12 @@ class MenuController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+        $menu->name = $request->input('name');
+        $menu->type = $request->input('type');
+        $menu->active = $request->input('active');
+        $menu->save();
+        return redirect()->back()->with('status', '更新完成');
     }
 
     /**
@@ -95,6 +103,68 @@ class MenuController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Menu::destroy($id);
+        $data['msg'] = '删除成功';
+        return response()->json($data);
+    }
+
+    public function s(Request $request)
+    {
+        $request->flash();
+        $name = $request->input('name'); //名称
+        $check = $request->except('name'); //选择项
+        //传入请求中存在指定的输入值的时候才执行查询
+        $menus = Menu::when($name, function ($query) use ($name){
+            return $query->where('name', 'like', '%'.$name.'%');
+        })
+            ->when(isset($check['breakfast']), function ($query){
+                return $query->orWhere('type', '=', 1);
+            })
+            ->when(isset($check['lunch']), function ($query){
+                return $query->orWhere('type', '=', 2);
+            })
+            ->when(isset($check['dinner']), function ($query){
+                return $query->orWhere('type', '=', 3);
+            })
+            ->when(isset($check['hightea']), function ($query){
+                return $query->orWhere('type', '=', 4);
+            })
+            ->when(isset($check['today_menu']), function ($query){
+                return $query->orWhere('active', '=', 1);
+            })
+            ->paginate(10);
+        //附加查询参数到分页链接中
+        if (!is_null('name')) $menus = $menus->appends(['name' => $name]);
+        if (isset($check['breakfast'])) $menus = $menus->appends(['breakfast' => isset($check['breakfast'])]);
+        if (isset($check['lunch'])) $menus = $menus->appends(['breakfast' => isset($check['lunch'])]);
+        if (isset($check['dinner'])) $menus = $menus->appends(['dinner' => isset($check['dinner'])]);
+        if (isset($check['hightea'])) $menus = $menus->appends(['hightea' => isset($check['hightea'])]);
+        if (isset($check['today_menu'])) $menus = $menus->appends(['today_menu' => isset($check['today_menu'])]);
+
+        return view('staff.menu.index',['menus' => $menus]);
+    }
+
+    public function todayMenu($id)
+    {
+        $data = [];
+        $menu = Menu::findOrFail($id);
+//        $menu->active ? $menu->active = 0 : $menu->active = 1;
+        if ($menu->active) {
+            $menu->active = 0 ;
+            $data['name'] = '添加';
+        } else {
+            $menu->active = 1 ;
+            $data['name'] = '取消';
+        }
+        $menu->save();
+        return response()->json($data);
+    }
+
+    public function massTodayMenu(Request $request)
+    {
+        $type = $request->input('type');
+        $ids = $request->input('ids');
+        $menu = Menu::whereIn('id',$ids)->update(['active' => $type]);
+        return redirect()->back();
     }
 }
