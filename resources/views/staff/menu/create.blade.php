@@ -67,10 +67,10 @@
                                     <label class="control-label col-md-2">今日菜单</label>
                                     <div class="radio col-md-5">
                                         <label>
-                                            <input type="radio" name="active" value="1">是
+                                            <input type="radio" name="active" value="1" checked>是
                                         </label>
                                         <label>
-                                            <input type="radio" name="active" value="0" checked>否
+                                            <input type="radio" name="active" value="0">否
                                         </label>
                                     </div>
                                 </div>

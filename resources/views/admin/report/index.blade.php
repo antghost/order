@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row">
-        @component('admin.navpill',[ '$report' => 'class=active'])
+        @component('admin.navpill',[ 'report' => 'class=active'])
 
         @endcomponent
 

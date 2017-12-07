@@ -13,6 +13,8 @@
 
 Route::get('/', 'IndexController@index');
 Route::get('/getMenu', 'IndexController@getMenu');
+Route::get('/getUserNum', 'IndexController@getUserNum');
+Route::get('/notice/{id}', 'IndexController@notice');
 
 Auth::routes();
 

@@ -9,7 +9,10 @@
         <!-- Styles -->
         <link href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}" rel="stylesheet">
 {{--    <link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
-</head>
+        <style>
+            .word{ background-color:white;height: 110px;word-break: break-all;word-wrap: break-word;}
+        </style>
+    </head>
 <body style="background-color:whitesmoke">
 <div class="container">
     <div class="row clearfix">
@@ -76,7 +79,7 @@
                 </div>
                 <div class="col-md-8" style="background-color:white; height: 100px">
                     <h5>早餐人数</h5>
-                    <h1>{{ $userInBreakfasts }}</h1>
+                    <h1 id="breakfast_count" class="text-info">{{ $userInBreakfasts }}</h1>
                 </div>
             </div>
 
@@ -88,7 +91,7 @@
                 </div>
                 <div class="col-md-8" style="background-color:white;height: 100px">
                     <h5>午餐人数</h5>
-                    <h1>{{ $userInLunches }}</h1>
+                    <h1 id="lunch_count" class="text-info">{{ $userInLunches }}</h1>
                 </div>
             </div>
 
@@ -100,7 +103,7 @@
                 </div>
                 <div class="col-md-8" style="background-color:white;height: 100px">
                     <h5>晚餐人数</h5>
-                    <h1>{{ $userInDinners }}</h1>
+                    <h1 id="dinner_count" class="text-info">{{ $userInDinners }}</h1>
                 </div>
             </div>
 
@@ -112,12 +115,14 @@
                         <p>早餐</p>
                     </div>
                 </div>
-                <div class="col-md-10" style="background-color:white;height: 110px">
-                    <h3>
+                <div class="col-md-10 word">
+                    <marquee id="scroll_text" onmouseover="this.stop()" onmouseout="this.start();" height="110px" scrollAmount="2" behavior="scroll" direction="up">
+                    <h2 id="breakfast_menu">
                         @foreach($breakfastMenus as $breakfastMenu)
                             {{ $breakfastMenu->name }} ;
                         @endforeach
-                    </h3>
+                    </h2>
+                    </marquee>
                 </div>
             </div>
 
@@ -128,12 +133,14 @@
                         <p>午餐</p>
                     </div>
                 </div>
-                <div class="col-md-10" style="background-color:white;height: 110px">
-                    <h3>
+                <div class="col-md-10 word">
+                    <marquee id="scroll_text" onmouseover="this.stop()" onmouseout="this.start();" height="110px" scrollAmount="2" behavior="scroll" direction="up">
+                    <h2 id="lunch_menu">
                         @foreach($lunchMenus as $lunchMenu)
                             {{ $lunchMenu->name }} ;
                         @endforeach
-                    </h3>
+                    </h2>
+                    </marquee>
                 </div>
             </div>
 
@@ -144,26 +151,27 @@
                         <p>晚餐</p>
                     </div>
                 </div>
-                <div class="col-md-10" style="background-color:white;height: 110px">
-                    <h3>
+                <div class="col-md-10 word">
+                    <marquee id="scroll_text" onmouseover="this.stop()" onmouseout="this.start();" height="110px" scrollAmount="2" behavior="scroll" direction="up">
+                    <h2 id="dinner_menu">
                         @foreach($dinnerMenus as $dinnerMenu)
                             {{ $dinnerMenu->name }} ;
                         @endforeach
-                    </h3>
+                    </h2>
+                    </marquee>
                 </div>
             </div>
         </div>
 
         {{--右侧通知栏--}}
-        <div id="notice" class="col-md-3 col-md-offset-0" style="background-color: white">
+        <div id="div_notice" class="col-md-3 col-md-offset-0" style="background-color: white">
             <h1 class="page-header">通知</h1>
-            @foreach($notices as $notice)
-                <div>
-                    <li><h4 class="text-primary"><a href="">{{ $notice->title }}</a></h4></li>
-                    <div><p style="text-indent:2em">{{ str_limit($notice->content,200) }}<a href="">查看</a></p></div>
-                    <line></line>
-                </div>
-            @endforeach
+            <div id="div_notice">
+                @foreach($notices as $notice)
+                    <li><h4 class="text-primary"><a href="{{ url('/notice/'.$notice->id) }}" class="notice">{{ $notice->title }}</a></h4></li>
+                    <p style="text-indent:2em">{{ str_limit($notice->content,200) }}<a href="{{ url('/notice/'.$notice->id) }}" class="notice">查看</a></p>
+                @endforeach
+            </div>
         </div>
 
     </div>
@@ -171,9 +179,58 @@
 
 <!-- javascript -->
 <script src="{{ asset('js/app.js') }}"></script>
+<script src="{{ asset('layer/layer.js') }}"></script>
 <script>
-    {{--$.get("{{ url('/getMenu') }}").done(function (data) {--}}
-    {{--});--}}
+    //显示通知详情
+    $('#div_notice').on('click', 'a.notice', function () {
+        var _href = $(this).attr('href');
+        layer.open({
+            type: 2,
+            title: '通知',
+            area: ['600px', '500px'], //宽\高
+            content: _href,
+            success: function(layero, index){
+            },
+            end: function(){
+            },
+        });
+        return false;
+    });
+    //定时刷新
+    var t = 5*60*1000;
+    setInterval(function () {
+        //就餐人数
+        $.get("{{ url('/getUserNum') }}").done(function (data) {
+            $('#breakfast_count').html(data.breakfast);
+            $('#lunch_count').html(data.lunch);
+            $('#dinner_count').html(data.dinner);
+        });
+        //菜单
+        $.get("{{ url('/getMenu') }}").done(function (data) {
+            var breakfast_html = '';
+            var lunch_html = '';
+            var dinner_html = '';
+            for(i =0; i<data['breakfast'].length; i++){
+                breakfast_html += data['breakfast'][i].name +';'
+            }
+            for(i =0; i<data['lunch'].length; i++){
+                lunch_html += data['lunch'][i].name +';'
+            }
+            for(i =0; i<data['dinner'].length; i++){
+                dinner_html += data['dinner'][i].name +';'
+            }
+            //早餐
+            $('#breakfast_menu').html(breakfast_html);
+            //午餐
+            $('#lunch_menu').html(lunch_html);
+            //晚餐
+            $('#dinner_menu').html(dinner_html);
+//            console.log(breakfast_html);
+//            console.log(lunch_html);
+//            console.log(dinner_html);
+        });
+    }, t);
+
 </script>
 </body>
 </html>

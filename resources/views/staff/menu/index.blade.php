@@ -64,7 +64,7 @@
                             <th><input type="checkbox" id="check_all" class="checkbox" name="" value="选择"></th>
                             <th>名称</th>
                             <th>类型</th>
-                            <th>今日菜单</th>
+                            {{--<th>今日菜单</th>--}}
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -80,13 +80,13 @@
                                     </div>
                                 </td>
                                 <td>{{ $menu->type or '' }}</td>
-                                <td>
-                                    @if($menu->active)
-                                        <button type="button" name="menu_today" class="btn btn-warning" value="{{ $menu->id }}">取消</button>
-                                    @else
-                                        <button type="button" name="menu_today" class="btn btn-info" value="{{ $menu->id }}">添加</button>
-                                    @endif
-                                </td>
+                                {{--<td>--}}
+                                    {{--@if($menu->active)--}}
+                                        {{--<button type="button" name="menu_today" class="btn btn-warning" value="{{ $menu->id }}">取消</button>--}}
+                                    {{--@else--}}
+                                        {{--<button type="button" name="menu_today" class="btn btn-info" value="{{ $menu->id }}">添加</button>--}}
+                                    {{--@endif--}}
+                                {{--</td>--}}
                                 <td>
                                     <button type="button" name="menu_edit" class="btn btn-default" value="{{ $menu->id }}">编辑</button>
                                     <button type="button" name="menu_delete" class="btn btn-danger" value="{{ $menu->id }}">删除</button>
