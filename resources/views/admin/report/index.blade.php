@@ -61,7 +61,7 @@
 @section('script')
     <script src="{{asset('My97DatePicker/WdatePicker.js')}}"></script>
     <script>
-        $("from").submit(function () {
+        $("form").submit(function () {
             $("button:submit").prop('disabled', true).text('提交中');
         });
     </script>

@@ -30,12 +30,12 @@
                                         <label for="name">角色</label>
                                         <input type="text" id="name" name="name" class="form-control" value="{{old('name')}}">
                                     </div>
-                                    <div class="form-group">
+                                    {{--<div class="form-group">
                                         <label for="dept">权限</label>
                                         <select name="dept" id="dept" class="form-control">
                                             <option value=""></option>
                                         </select>
-                                    </div>
+                                    </div>--}}
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">搜索</button>
                                     </div>

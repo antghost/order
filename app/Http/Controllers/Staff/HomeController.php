@@ -92,6 +92,7 @@ class HomeController extends Controller
         $year = $request->input('year');
         $data = [];
 
+        //对报表数据按月份分组统计早、中、晚餐
         $reportDatas = ReportData::select('month',
             DB::raw('sum(case when breakfasts>0 then 1 else 0 end) as breakfast_users,
             sum(case when lunches>0 then 1 else 0 end) as lunch_users,
@@ -100,15 +101,25 @@ class HomeController extends Controller
             sum(breakfast_amount) as breakfast_amount,sum(lunch_amount) as lunch_amount,sum(dinner_amount) as dinner_amount'))
             ->where('year', $year) //->where('breakfasts', '>', 0)
             ->groupBy('month')->orderBy('month')->get();
+
         foreach ($reportDatas as $reportData) {
+            //早餐用餐人数
             $breakfastUsers[] = $reportData->breakfast_users;
+            //午餐用餐人数
             $lunchUsers[] = $reportData->lunch_users;
+            //晚餐用餐人数
             $dinnerUsers[] = $reportData->dinner_users;
+            //早餐月用餐总人数
             $breakfasts[] = $reportData->breakfasts;
+            //午餐月用餐总人数
             $lunches[] = $reportData->lunches;
+            //晚餐月用餐总人数
             $dinners[] = $reportData->dinners;
+            //早餐月用餐总金额
             $breakfastAmount[] = $reportData->breakfast_amount;
+            //午餐月用餐总金额
             $lunchAmount[] = $reportData->lunch_amount;
+            //晚餐月用餐总金额
             $dinnerAmount[] = $reportData->dinner_amount;
         }
         $data['breakfast_users'] = $breakfastUsers;
