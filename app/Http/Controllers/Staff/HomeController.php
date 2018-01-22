@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class HomeController extends Controller
 {
@@ -31,33 +32,121 @@ class HomeController extends Controller
      */
     public function getData()
     {
+        //redis中setex的有效时长（秒）
+        define('TIMEOUT', 300);
+
         $today = Carbon::today();
         $tomorrow = Carbon::tomorrow();
 
+        //将数据写到redis缓存中并设置有效时间
         //当天用餐人数
-        $userOfDayInBreakfasts = $this->userOfDays($today, $today, 'breakfast');
-        $userOfDayInLunches = $this->userOfDays($today, $today, 'lunch');
-        $userOfDayInDinners = $this->userOfDays($today, $today, 'dinner');
+//        $userOfDayInBreakfasts = $this->userOfDays($today, $today, 'breakfast');
+//        $userOfDayInLunches = $this->userOfDays($today, $today, 'lunch');
+//        $userOfDayInDinners = $this->userOfDays($today, $today, 'dinner');
+
+        if (Redis::exists('DayInBreakfasts')) {
+            $userOfDayInBreakfasts = Redis::get('DayInBreakfasts');
+        } else {
+            $userOfDayInBreakfasts = $this->userOfDays($today, $today, 'breakfast');
+            Redis::setex('DayInBreakfasts', TIMEOUT, $userOfDayInBreakfasts);
+        }
+
+        if (Redis::exists('DayInLunches')) {
+            $userOfDayInLunches = Redis::get('DayInLunches');
+        } else {
+            $userOfDayInLunches = $this->userOfDays($today, $today, 'lunch');
+            Redis::setex('DayInLunches', TIMEOUT, $userOfDayInLunches);
+        }
+
+        if (Redis::exists('DayInDinners')) {
+            $userOfDayInDinners = Redis::get('DayInDinners');
+        } else {
+            $userOfDayInDinners = $this->userOfDays($today, $today, 'dinner');
+            Redis::setex('DayInDinners', TIMEOUT, $userOfDayInDinners);
+        }
 
         //明天用餐人数
-        $userOfTomorrowInBreakfasts = $this->userOfDays($tomorrow, $tomorrow, 'breakfast');
-        $userOfTomorrowInLunches = $this->userOfDays($tomorrow, $tomorrow, 'lunch');
-        $userOfTomorrowInDinners = $this->userOfDays($tomorrow, $tomorrow, 'dinner');
+//        $userOfTomorrowInBreakfasts = $this->userOfDays($tomorrow, $tomorrow, 'breakfast');
+//        $userOfTomorrowInLunches = $this->userOfDays($tomorrow, $tomorrow, 'lunch');
+//        $userOfTomorrowInDinners = $this->userOfDays($tomorrow, $tomorrow, 'dinner');
+
+        if (Redis::exists('TomorrowInBreakfasts')) {
+            $userOfTomorrowInBreakfasts = Redis::get('TomorrowInBreakfasts');
+        } else {
+            $userOfTomorrowInBreakfasts = $this->userOfDays($tomorrow, $tomorrow, 'breakfast');
+            Redis::setex('TomorrowInBreakfasts', TIMEOUT, $userOfTomorrowInBreakfasts);
+        }
+
+        if (Redis::exists('TomorrowInLunches')) {
+            $userOfTomorrowInLunches = Redis::get('TomorrowInLunches');
+        } else {
+            $userOfTomorrowInLunches = $this->userOfDays($tomorrow, $tomorrow, 'lunch');
+            Redis::setex('TomorrowInLunches', TIMEOUT, $userOfTomorrowInLunches);
+        }
+
+        if (Redis::exists('TomorrowInDinners')) {
+            $userOfTomorrowInDinners = Redis::get('TomorrowInDinners');
+        } else {
+            $userOfTomorrowInDinners = $this->userOfDays($tomorrow, $tomorrow, 'dinner');
+            Redis::setex('TomorrowInDinners', TIMEOUT, $userOfTomorrowInDinners);
+        }
 
         //本周用餐人数
         $startDate = $today->copy()->startOfWeek();
         $endDate = $startDate->copy()->addDays(4);
 
-        $userOfWeekInBreakfasts = $this->userOfDays($startDate, $endDate, 'breakfast');
-        $userOfWeekInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
-        $userOfWeekInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
+//        $userOfWeekInBreakfasts = $this->userOfDays($startDate, $endDate, 'breakfast');
+//        $userOfWeekInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
+//        $userOfWeekInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
+
+        if (Redis::exists('WeekInBreakfasts')) {
+            $userOfWeekInBreakfasts = Redis::get('WeekInBreakfasts');
+        } else {
+            $userOfWeekInBreakfasts = $this->userOfDays($startDate, $endDate, 'breakfast');
+            Redis::setex('WeekInBreakfasts', TIMEOUT, $userOfWeekInBreakfasts);
+        }
+
+        if (Redis::exists('WeekInLunches')) {
+            $userOfWeekInLunches = Redis::get('WeekInLunches');
+        } else {
+            $userOfWeekInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
+            Redis::setex('WeekInLunches', TIMEOUT, $userOfWeekInLunches);
+        }
+
+        if (Redis::exists('WeekInDinners')) {
+            $userOfWeekInDinners = Redis::get('WeekInDinners');
+        } else {
+            $userOfWeekInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
+            Redis::setex('WeekInDinners', TIMEOUT, $userOfWeekInDinners);
+        }
 
         //本月用餐人数
         $startDate = $today->copy()->startOfMonth();
         $endDate = $today->copy()->endOfMonth();
-        $userOfMonthInBreakfasts = $this->userOfDays($startDate, $endDate, 'breakfast');
-        $userOfMonthInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
-        $userOfMonthInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
+//        $userOfMonthInBreakfasts = $this->userOfDays($startDate, $endDate, 'breakfast');
+//        $userOfMonthInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
+//        $userOfMonthInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
+
+        if (Redis::exists('MonthInBreakfasts')) {
+            $userOfMonthInBreakfasts = Redis::get('MonthInBreakfasts');
+        } else {
+            $userOfMonthInBreakfasts = $this->userOfDays($startDate, $endDate, 'breakfast');
+            Redis::setex('MonthInBreakfasts', TIMEOUT, $userOfMonthInBreakfasts);
+        }
+
+        if (Redis::exists('MonthInLunches')) {
+            $userOfMonthInLunches = Redis::get('MonthInLunches');
+        } else {
+            $userOfMonthInLunches = $this->userOfDays($startDate, $endDate, 'lunch');
+            Redis::setex('MonthInLunches', TIMEOUT, $userOfMonthInLunches);
+        }
+
+        if (Redis::exists('MonthInDinners')) {
+            $userOfMonthInDinners = Redis::get('MonthInDinners');
+        } else {
+            $userOfMonthInDinners = $this->userOfDays($startDate, $endDate, 'dinner');
+            Redis::setex('MonthInDinners', TIMEOUT, $userOfMonthInDinners);
+        }
 
         $data = [];
         $data = [

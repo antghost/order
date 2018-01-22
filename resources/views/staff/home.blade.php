@@ -71,7 +71,10 @@
 
 @section('script')
     <script src="{{asset('js/echarts.min.js')}}"></script>
+    <script src="{{ asset('layer/layer.js') }}"></script>
     <script>
+        var d = new Date();
+        var begin_time = d.getTime();
         //初始化echarts实例
         myChart = echarts.init(document.getElementById('echarts'));
         myChart.showLoading();
@@ -141,6 +144,11 @@
         myChart.clear();
         myChart.hideLoading();
         myChart.setOption(option);
+
+        var d = new Date();
+        var end_time = d.getTime();
+        var use_time = end_time - begin_time;
+        layer.msg('用时：'+(use_time)+'毫秒');
         });
     </script>
 @endsection
